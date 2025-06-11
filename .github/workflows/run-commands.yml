@@ -56,7 +56,7 @@ jobs:
             sf.write(f'data/raw/test/class1/sample_{i}.wav', signal_class1, sample_rate)
             sf.write(f'data/raw/test/class2/sample_{i}.wav', signal_class2, sample_rate)
         "
-        
+
     - name: Preprocess dataset
       run: |
         python preprocess.py -n run_flute --train_dir train --test_dir test --val_split train -sr 16000 -seglen '1000 ms'
@@ -64,11 +64,11 @@ jobs:
         
     - name: Train flute model
       run: |
-        python train.py -n run_flute -d cpu -m flute -sr 16000 --num_workers 2 --batch_size 32 -e 1 --n_mels 128 --n_fft 2048 --hop_length 512 || true
+        python train.py -n run_flute -d cpu -m flute -sr 16000 --num_workers 2 --batch_size 32 -e 1 --n_mels 128 --n_fft 2048 --hop_length 512 -seglen '1000 ms' || true
 
     - name: Train eguitar model
       run: |
-        python train.py -n run_eguitar -d cpu -m eguitar -sr 16000 --num_workers 2 --batch_size 32 -e 1 --n_mels 128 --n_fft 2048 --hop_length 512 || true
+        python train.py -n run_eguitar -d cpu -m eguitar -sr 16000 --num_workers 2 --batch_size 32 -e 1 --n_mels 128 --n_fft 2048 --hop_length 512 -seglen '1000 ms' || true
 
     - name: Check model in folder
       run: |
