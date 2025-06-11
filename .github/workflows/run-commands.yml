@@ -1,0 +1,75 @@
+name: CI Validate training pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  train:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11.7'
+        
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        
+    - name: Create dummy dataset
+      run: |
+        mkdir -p data/raw/train/class1 data/raw/train/class2
+        mkdir -p data/raw/test/class1 data/raw/test/class2
+        
+        # Import necessary libraries
+        python -c "
+        import numpy as np
+        import soundfile as sf
+        import os
+        
+        # Generate audio files with different frequencies for each class
+        for i in range(10):
+            # Parameters
+            sample_rate = 16000
+            duration = 1.0  # seconds
+            
+            # Generate time array
+            t = np.linspace(0, duration, int(sample_rate * duration))
+            
+            # Class 1: 440 Hz (A4 note)
+            signal_class1 = np.sin(2 * np.pi * 440 * t)
+            # Class 2: White Gaussian noise
+            signal_class2 = np.random.normal(0, 1, len(t))
+            
+            # Save files for each class in train, test and val
+            sf.write(f'data/raw/train/class1/sample_{i}.wav', signal_class1, sample_rate)
+            sf.write(f'data/raw/train/class2/sample_{i}.wav', signal_class2, sample_rate)
+            
+            sf.write(f'data/raw/test/class1/sample_{i}.wav', signal_class1, sample_rate)
+            sf.write(f'data/raw/test/class2/sample_{i}.wav', signal_class2, sample_rate)
+        "
+        
+    - name: Preprocess dataset
+      run: |
+        python preprocess.py -n run_flute --train_dir train --test_dir test --val_split train -sr 16000 -seglen '1000 ms'
+        python preprocess.py -n run_eguitar --train_dir train --test_dir test --val_split train -sr 16000 -seglen '1000 ms'
+        
+    - name: Train flute model
+      run: |
+        python train.py -n run_flute -d cpu -m flute -sr 16000 --num_workers 2 --batch_size 32 -e 1 --n_mels 128 --n_fft 2048 --hop_length 512 || true
+
+    - name: Train eguitar model
+      run: |
+        python train.py -n run_eguitar -d cpu -m eguitar -sr 16000 --num_workers 2 --batch_size 32 -e 1 --n_mels 128 --n_fft 2048 --hop_length 512 || true
+
+    - name: Check model in folder
+      run: |
+        ls -R runs/

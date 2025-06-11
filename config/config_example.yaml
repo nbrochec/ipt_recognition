@@ -1,0 +1,20 @@
+Name: your_project_name
+Device: cuda
+Model: v3
+Sampling Rate: 44100
+Segment Overlap: null
+F min: 120
+F max: null
+Offline Augment: 1
+Online Augment: []
+Learning Rate: 0.001
+Epochs: 100
+Early Stopping: 20
+Reduce LR: 1
+Padding: minimal
+Batch size: 128
+Use Original: 1
+N mels: 384
+N FFT: 2048
+Hop Length: 128
+Segment Length: 14700

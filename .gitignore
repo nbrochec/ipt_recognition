@@ -1,0 +1,26 @@
+# macOS
+.DS_Store
+
+# System files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# VS Code
+.vscode/
+
+# Ignore hidden files, but not .gitignore and .gitkeep
+.*
+!.gitignore
+!.gitkeep
+!.github
+
+# Python caches
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# pip cache
+pip-log.txt
+pip-delete-this-directory.txt
