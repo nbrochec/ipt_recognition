@@ -68,7 +68,7 @@ if __name__ == '__main__':
 
     config_file_manager = ConfigFile(args)
 
-    if args.cfg:
+    if args.config:
         args = config_file_manager.load(args)
     else:
         args.segment_length = SegLenConverter.parse_and_convert(args.segment_length, args.sampling_rate)
