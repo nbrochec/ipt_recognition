@@ -67,9 +67,9 @@ class ConfigFile:
             with open(yaml_file, 'w') as file:
                 yaml.dump(current_config, file, default_flow_style=False)
 
-    def load(self):
+    def load(self, args):
         script_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        yaml_file = os.path.join(script_dir, 'config', self.args.config)
+        yaml_file = os.path.join(script_dir, 'config', args.cfg)
 
         if not os.path.exists(yaml_file):
             raise FileNotFoundError(f"No YAML file found at {yaml_file}")
@@ -78,9 +78,9 @@ class ConfigFile:
             config = yaml.safe_load(file)
 
         for key, value in config.items():
-            setattr(self.args, key.lower().replace(" ", "_"), value)
+            setattr(args, key.lower().replace(" ", "_"), value)
 
-        return self.args
+        return args
 
 class CSVFilePath:
     @staticmethod
