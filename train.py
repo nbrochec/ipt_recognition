@@ -39,7 +39,7 @@ def parse_arguments():
     parser.add_argument('--hop_length', type=int, help='Hop length.', default=512)
     parser.add_argument('--num_workers', type=int, help='Number of workers for data loading.', default=4)
     parser.add_argument('-seglen','--segment_length', type=str, help='Defines segment length of audio data samples.', default='14700 samps')
-    parser.add_argument('-c', '--cfg', type=str, help='Specify YAML file path.')
+    parser.add_argument('-cfg', '--config', type=str, help='Specify YAML file path.')
 
     args = parser.parse_args()
     return args
