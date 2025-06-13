@@ -1,14 +1,14 @@
-Name: your_project_name
-Device: cuda
-Model: v3
-Sampling Rate: 44100
+Name: run_flute
+Device: cpu
+Model: flute
+Sampling Rate: 24000
 Segment Overlap: null
 F min: 120
 F max: null
 Offline Augment: 1
-Online Augment: []
+Online Augment: 1
 Learning Rate: 0.001
-Epochs: 100
+Epochs: 1
 Early Stopping: 20
 Reduce LR: 1
 Padding: minimal
@@ -17,4 +17,4 @@ Use Original: 1
 N mels: 384
 N FFT: 2048
 Hop Length: 128
-Segment Length: 14700
+Segment Length: '1000 ms'
