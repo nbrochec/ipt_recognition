@@ -108,9 +108,9 @@ You can use the following arguments if you want to test different configurations
 | `--early_stopping`  | Number of epochs without improvement before early stopping.         | Integer value > `0`   |        |
 | `--reduce_lr`        | Reduce learning rate if validation plateaus.                       | `0` or `1`             |     `0`    |
 
-You can also pass a `.yaml` configuration file using `--cfg` argument:
+You can also pass a `.yaml` configuration file using `--config` argument:
 ```bash
-python train.py --name your_project_name --cfg your_config_file.yaml
+python train.py --name your_project_name --config your_config_file.yaml
 ```
 ### 📊 Monitoring Training
 1. Detach from current screen: `ctrl`+`A`+`D`
