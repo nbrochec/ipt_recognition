@@ -2,11 +2,13 @@
 
 This repository provides a toolkit for the real-time recognition of instrumental playing techniques using deep learning CNN models. It allows the user to train his own classification model using his personal data. The toolkit also provide pre-trained models for flute and eguitar IPT recognition.
 
+Trained models can be run in real-time in Max/MSP thanks to `ipt~` external object from [ipt_tilde](https://github.com/nbrochec/ipt_tilde) repository.
+
 ## 🚀 Installation
 Clone this repository, navigate to the folder, create a conda environment with Python 3.11.7, and install requirements.
 ```bash
-git clone https://github.com/nbrochec/realtimeIPTrecognition/
-cd realtimeIPTrecognition
+git clone https://github.com/nbrochec/ipt_recognition/
+cd ipt_recognition
 conda create --name IPT python=3.11.7
 conda activate IPT
 pip install -r requirements.txt
@@ -52,7 +54,7 @@ Open a screen and navigate to the root folder.
 ```bash
 screen -S IPT
 conda activate IPT
-cd realtimeIPTrecognition
+cd ipt_recognition
 ```
 
 Preprocess your datasets:
@@ -118,7 +120,7 @@ python train.py --name your_project_name --config your_config_file.yaml
 ```bash
 screen -S monitor
 conda activate IPT
-cd realtimeIPTrecognition
+cd ipt_recognition
 ```
 3. Start tensorboard:
 ```bash
