@@ -68,8 +68,8 @@ class ConfigFile:
                 yaml.dump(current_config, file, default_flow_style=False)
 
     def load(self):
-        cwd = os.getcwd()
-        yaml_file = os.path.join(cwd, f'config/{self.args.cfg}')
+        script_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        yaml_file = os.path.join(script_dir, 'config', self.args.cfg)
 
         if not os.path.exists(yaml_file):
             raise FileNotFoundError(f"No YAML file found at {yaml_file}")
