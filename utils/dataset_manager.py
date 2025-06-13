@@ -27,7 +27,7 @@ class ConfigFile:
     def __init__(self, args):
         self.args = args
 
-    def save(self, current_run):
+    def save(self, current_run, args):
         cwd = os.getcwd()
         path_to_run = current_run
 
@@ -38,28 +38,28 @@ class ConfigFile:
             os.makedirs(path_to_run)
 
         current_config = {
-            'Name': self.args.name,
-            'Device': self.args.device,
-            'Model': self.args.model,
-            'Sampling Rate': self.args.sampling_rate,
-            'Segment Overlap': self.args.segment_overlap,
-            'F min': self.args.f_min,
-            'F max': self.args.f_max,
-            'Offline Augment': self.args.offline_augment,
-            'Online Augment': self.args.online_augment,
-            'Learning Rate': self.args.learning_rate,
-            'Epochs': self.args.epochs,
-            'Early Stopping': self.args.early_stopping,
-            'Reduce LR': self.args.reduce_lr,
-            'Padding': self.args.padding,
-            'Batch size': self.args.batch_size,
-            'Use Original': self.args.use_original,
-            'N mels': self.args.n_mels,
-            'N FFT': self.args.n_fft,
-            'Hop Length': self.args.hop_length,
-            'Segment Length': self.args.segment_length,
-            'Class Names': self.args.class_names,
-            'Num Classes': self.args.num_classes}
+            'Name': args.name,
+            'Device': args.device,
+            'Model': args.model,
+            'Sampling Rate': args.sampling_rate,
+            'Segment Overlap': getattr(args, 'segment_overlap', None),
+            'F min': getattr(args, 'f_min', None),
+            'F max': getattr(args, 'f_max', None),
+            'Offline Augment': getattr(args, 'offline_augment', None),
+            'Online Augment': getattr(args, 'online_augment', None),
+            'Learning Rate': getattr(args, 'learning_rate', None),
+            'Epochs': args.epochs,
+            'Early Stopping': getattr(args, 'early_stopping', None),
+            'Reduce LR': getattr(args, 'reduce_lr', None),
+            'Padding': getattr(args, 'padding', None),
+            'Batch size': args.batch_size,
+            'Use Original': getattr(args, 'use_original', None),
+            'N mels': args.n_mels,
+            'N FFT': args.n_fft,
+            'Hop Length': args.hop_length,
+            'Segment Length': args.segment_length,
+            'Class Names': getattr(args, 'class_names', None),
+            'Num Classes': getattr(args, 'num_classes', None)}
         
         yaml_file = os.path.join(path_to_run, f'{os.path.basename(path_to_run)}.yaml')
 
