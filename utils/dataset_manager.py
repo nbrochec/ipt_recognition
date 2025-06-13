@@ -27,7 +27,7 @@ class ConfigFile:
     def __init__(self, args):
         self.args = args
 
-    def save(self, current_run, args):
+    def save(self, current_run):
         cwd = os.getcwd()
         path_to_run = current_run
 
@@ -38,28 +38,28 @@ class ConfigFile:
             os.makedirs(path_to_run)
 
         current_config = {
-            'Name': args.name,
-            'Device': args.device,
-            'Model': args.model,
-            'Sampling Rate': args.sampling_rate,
-            'Segment Overlap': getattr(args, 'segment_overlap', None),
-            'F min': getattr(args, 'f_min', None),
-            'F max': getattr(args, 'f_max', None),
-            'Offline Augment': getattr(args, 'offline_augment', None),
-            'Online Augment': getattr(args, 'online_augment', None),
-            'Learning Rate': getattr(args, 'learning_rate', None),
-            'Epochs': args.epochs,
-            'Early Stopping': getattr(args, 'early_stopping', None),
-            'Reduce LR': getattr(args, 'reduce_lr', None),
-            'Padding': getattr(args, 'padding', None),
-            'Batch size': args.batch_size,
-            'Use Original': getattr(args, 'use_original', None),
-            'N mels': args.n_mels,
-            'N FFT': args.n_fft,
-            'Hop Length': args.hop_length,
-            'Segment Length': args.segment_length,
-            'Class Names': getattr(args, 'class_names', None),
-            'Num Classes': getattr(args, 'num_classes', None)}
+            'Name': self.args.name,
+            'Device': self.args.device,
+            'Model': self.args.model,
+            'Sampling Rate': self.args.sampling_rate,
+            'Segment Overlap': getattr(self.args, 'segment_overlap', None),
+            'F min': getattr(self.args, 'f_min', None),
+            'F max': getattr(self.args, 'f_max', None),
+            'Offline Augment': getattr(self.args, 'offline_augment', None),
+            'Online Augment': getattr(self.args, 'online_augment', None),
+            'Learning Rate': getattr(self.args, 'learning_rate', None),
+            'Epochs': self.args.epochs,
+            'Early Stopping': getattr(self.args, 'early_stopping', None),
+            'Reduce LR': getattr(self.args, 'reduce_lr', None),
+            'Padding': getattr(self.args, 'padding', None),
+            'Batch size': self.args.batch_size,
+            'Use Original': getattr(self.args, 'use_original', None),
+            'N mels': self.args.n_mels,
+            'N FFT': self.args.n_fft,
+            'Hop Length': self.args.hop_length,
+            'Segment Length': self.args.segment_length,
+            'Class Names': getattr(self.args, 'class_names', None),
+            'Num Classes': getattr(self.args, 'num_classes', None)}
         
         yaml_file = os.path.join(path_to_run, f'{os.path.basename(path_to_run)}.yaml')
 
@@ -67,9 +67,9 @@ class ConfigFile:
             with open(yaml_file, 'w') as file:
                 yaml.dump(current_config, file, default_flow_style=False)
 
-    def load(self, args):
+    def load(self):
         script_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        yaml_file = os.path.join(script_dir, 'config', args.cfg)
+        yaml_file = os.path.join(script_dir, 'config', self.args.config)
 
         if not os.path.exists(yaml_file):
             raise FileNotFoundError(f"No YAML file found at {yaml_file}")
@@ -78,9 +78,9 @@ class ConfigFile:
             config = yaml.safe_load(file)
 
         for key, value in config.items():
-            setattr(args, key.lower().replace(" ", "_"), value)
+            setattr(self.args, key.lower().replace(" ", "_"), value)
 
-        return args
+        return self.args
 
 class CSVFilePath:
     @staticmethod
