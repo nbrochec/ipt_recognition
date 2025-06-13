@@ -80,6 +80,10 @@ class ConfigFile:
         for key, value in config.items():
             setattr(self.args, key.lower().replace(" ", "_"), value)
 
+        # Convert segment length from string with units to integer samples
+        if isinstance(self.args.segment_length, str):
+            self.args.segment_length = SegLenConverter.parse_and_convert(self.args.segment_length, self.args.sampling_rate)
+
         return self.args
 
 class CSVFilePath:
