@@ -69,7 +69,7 @@ class ConfigFile:
 
     def load(self):
         script_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        yaml_file = os.path.join(script_dir, 'config', self.args.cfg)
+        yaml_file = os.path.join(script_dir, 'config', self.args.config)
 
         if not os.path.exists(yaml_file):
             raise FileNotFoundError(f"No YAML file found at {yaml_file}")
