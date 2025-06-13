@@ -24,7 +24,7 @@ def parse_arguments():
     parser = argparse.ArgumentParser(description='This script launches the training process.')
     parser.add_argument('-n','--name', type=str, help='Name of the project.', required=True)
     parser.add_argument('-d','--device', type=str, help='Specify the hardware on which computation should be performed.', default='cpu')
-    parser.add_argument('-m','--model', type=str, help='Model version.', default='v1')
+    parser.add_argument('-m','--model', type=str, help='Model version.', default='flute')
     parser.add_argument('-sr','--sampling_rate', type=int, help='Sampling rate for downsampling the audio files.', default=44100)
     parser.add_argument('--f_min', type=int, help='Minimum frequency for logmelspec analysis.', default=20)
     parser.add_argument('--f_max', type=int, help='Maximum frequency for logmelspec analysis.')
