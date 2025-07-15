@@ -61,8 +61,8 @@ class ToDisk:
                                  'Reduce LR on Plateau',
                                 #  'Padding',
                                  'Accuracy',
-                                 'Precision',
-                                 'Recall',
+                                #  'Precision',
+                                #  'Recall',
                                  'F1 Score',
                                  'Loss'])
 
