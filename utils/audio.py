@@ -51,7 +51,7 @@ class AudioPreprocessor:
             segments = self.process_segments(waveform)
 
             for idx, segment in enumerate(segments):
-                if self.is_train in file_path:
+                if self.is_train:
                     aug1, aug2, aug3 = self.augmenter(segment)
                     self.save_segment(aug1, output_dir, idx, "detuned", file_path)
                     self.save_segment(aug2, output_dir, idx, "noise", file_path)
