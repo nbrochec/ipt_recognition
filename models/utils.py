@@ -26,7 +26,7 @@ class ModelChecker:
     """Check if the provided model name is valid."""
     def __init__(self, model_name):
         self.available_models = {
-            'eguitar', 'flute'
+            'eguitar', 'flute', 'base'
         }
         self.model_name = model_name
         self.validate_model()
@@ -47,6 +47,7 @@ class LoadModel:
         self.models = {
             'eguitar': eguitar,
             'flute': flute,
+            'base': base,
         }
 
     def get_model(self, model_name, output_nbr, args):
