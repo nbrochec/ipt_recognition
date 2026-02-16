@@ -77,3 +77,44 @@ jobs:
     - name: Check model in folder
       run: |
         ls -R runs/
+
+    - name: Create dummy dataset for finetuning
+      run: |
+        mkdir -p data/raw/finetune_train/class1 data/raw/finetune_train/class2
+        mkdir -p data/raw/finetune_test/class1 data/raw/finetune_test/class2
+        
+        # Import necessary libraries
+        python -c "
+        import numpy as np
+        import soundfile as sf
+        import os
+        
+        # Generate audio files with different frequencies for each class
+        for i in range(10):
+            # Parameters
+            sample_rate = 44100
+            duration = 1.0  # seconds
+            
+            # Generate time array
+            t = np.linspace(0, duration, int(sample_rate * duration))
+            
+            # Class 1: 440 Hz (A4 note)
+            signal_class1 = np.sin(2 * np.pi * 440 * t)
+            # Class 2: White Gaussian noise
+            signal_class2 = np.random.normal(0, 1, len(t))
+            
+            # Save files for each class in train, test and val
+            sf.write(f'data/raw/finetune_train/class1/sample_{i}.wav', signal_class1, sample_rate)
+            sf.write(f'data/raw/finetune_train/class2/sample_{i}.wav', signal_class2, sample_rate)
+            
+            sf.write(f'data/raw/finetune_test/class1/sample_{i}.wav', signal_class1, sample_rate)
+            sf.write(f'data/raw/finetune_test/class2/sample_{i}.wav', signal_class2, sample_rate)
+        "
+
+    - name: Preprocess dataset
+      run: |
+        python preprocess.py -n finetuning --train_dir finetune_train --test_dir finetune_test --val_split train -sr 44100 -seglen '14700 samps'
+
+    - name: Finetune flute model
+      run:  |
+        python finetune.py -n finetuning -d cpu -m base -sr 44100 --num_workers 2 --batch_size 32 -e 1 --n_mels 384 --n_fft 2048 --hop_length 128 -seglen '14700 samps' || true
