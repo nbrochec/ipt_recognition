@@ -143,6 +143,22 @@ In `/logs/your_project_name_date_time/`:
 - Confusion matrix (`.csv`)
 - Results (`.csv`)
 
+## 🎯 Finetuning
+
+You can fine-tune a pretrained model on your data.
+
+1. Preprocess your data
+```
+python preprocess.py --name your_project_name
+```
+
+2. Execute finetune.py
+```
+python finetune.py --name your_project_name
+```
+
+By default, the script uses `flute_pretained.pth` model from folder `pretrained` with `base` architecture. See [finetune.py](./finetune.py) script for argument details.
+
 ## 💻 Running the model in real-time using Max/MSP
 
 We developed a dedicated Max/MSP object to run the exported `.ts` model in real-time.
