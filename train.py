@@ -28,7 +28,7 @@ def parse_arguments():
     parser.add_argument('-sr','--sampling_rate', type=int, help='Sampling rate for downsampling the audio files.', default=44100)
     parser.add_argument('--f_min', type=int, help='Minimum frequency for logmelspec analysis.', default=20)
     parser.add_argument('--f_max', type=int, help='Maximum frequency for logmelspec analysis.')
-    parser.add_argument('--online_augment', type=int, help='Specify which online augmentations to use.')
+    parser.add_argument('--online_augment', type=int, help='Use online augmentations based on polarity inversion, lpf and hpf.')
     parser.add_argument('-lr','--learning_rate', type=float, help='Learning rate.', default=0.001)
     parser.add_argument('-e', '--epochs', type=int, help='Number of training epochs.', default=100)
     parser.add_argument('--early_stopping', type=int, help='Number of epochs without improvement before early stopping.', default=None)
