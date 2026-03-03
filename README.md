@@ -4,6 +4,8 @@ This repository provides a toolkit for the real-time recognition of instrumental
 
 Trained models can be run in real-time in Max/MSP thanks to `ipt~` external object from [ipt_tilde](https://github.com/nbrochec/ipt_tilde) repository.
 
+This repository is a core component of **SPIRIT** (System for Real-Time Recognition of Instrumental Playing Techniques).
+
 ## 🚀 Installation
 Clone this repository, navigate to the folder, create a conda environment with Python 3.11.7, and install requirements.
 ```bash
