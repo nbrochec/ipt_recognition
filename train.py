@@ -100,7 +100,7 @@ if __name__ == '__main__':
 
     transform = AudioOnlineTransforms(args)
 
-    trainer = ModelTrainer(model, loss_fn, args.device, transform)
+    trainer = ModelTrainer(model, loss_fn, args.device, transform, args.num_classes)
 
     log_queue = Queue()
     log_dir = f'runs/{args.name}_{date}_{time}'
