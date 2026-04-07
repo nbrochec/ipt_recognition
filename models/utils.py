@@ -121,12 +121,19 @@ class ModelInit:
 
 
 class ModelTrainer:
-    def __init__(self, model, loss_fn, device, transform):
+    def __init__(self, model, loss_fn, device, transform, num_classes):
         """Initialize the ModelTrainer."""
         self.model = model
         self.loss_fn = loss_fn
         self.device = device
         self.transform = transform
+        self.num_classes = num_classes
+
+        self.val_acc = MulticlassAccuracy(num_classes=num_classes, average='micro').to(device)
+        self.val_f1 = MulticlassF1Score(num_classes=num_classes, average='macro').to(device)
+        self.test_acc = MulticlassAccuracy(num_classes=num_classes, average='micro').to(device)
+        self.test_f1 = MulticlassF1Score(num_classes=num_classes, average='macro').to(device)
+        self.test_cm = MulticlassConfusionMatrix(num_classes=num_classes).to(device)
 
     def train_epoch(self, loader, optimizer):
         """Perform one training epoch."""
@@ -150,21 +157,8 @@ class ModelTrainer:
         """Perform one validation epoch."""
         self.model.eval()
         running_loss = 0.0
-
-        all_targets = []
-        for data, targets in loader:
-            all_targets.append(targets.cpu())
-        all_targets = torch.cat(all_targets)
-        class_nbr = len(torch.unique(all_targets))
-
-        val_acc = MulticlassAccuracy(
-            num_classes=class_nbr,
-            average='micro').to(
-            self.device)
-        val_f1 = MulticlassF1Score(
-            num_classes=class_nbr,
-            average='macro').to(
-            self.device)
+        self.val_acc.reset()
+        self.val_f1.reset()
 
         with torch.no_grad():
             for data, targets in tqdm(loader, desc="Validation", leave=False):
@@ -174,14 +168,14 @@ class ModelTrainer:
                 running_loss += loss.item() * data.size(0)
                 _, predicted = torch.max(outputs, 1)
 
-                val_acc.update(preds=predicted, target=targets)
-                val_f1.update(preds=predicted, target=targets)
+                self.val_acc.update(preds=predicted, target=targets)
+                self.val_f1.update(preds=predicted, target=targets)
 
         val_loss = running_loss / len(loader.dataset)
         val_loss = torch.tensor(val_loss).to(self.device)
 
-        val_acc = val_acc.compute().detach().cpu().item()
-        val_f1 = val_f1.compute().detach().cpu().item()
+        val_acc = self.val_acc.compute().detach().cpu().item()
+        val_f1 = self.val_f1.compute().detach().cpu().item()
 
         return val_loss, val_acc, val_f1
 
@@ -190,24 +184,9 @@ class ModelTrainer:
         self.model.eval()
         running_loss = 0.0
         total_samples = 0
-
-        all_targets = []
-        for data, targets in loader:
-            all_targets.append(targets.cpu())
-        all_targets = torch.cat(all_targets)
-        class_nbr = len(torch.unique(all_targets))
-
-        accuracy_metric = MulticlassAccuracy(
-            num_classes=class_nbr,
-            average='micro').to(
-            self.device)
-        f1_metric = MulticlassF1Score(
-            num_classes=class_nbr,
-            average='macro').to(
-            self.device)
-        cm_metric = MulticlassConfusionMatrix(
-            num_classes=class_nbr).to(
-            self.device)
+        self.test_acc.reset()
+        self.test_f1.reset()
+        self.test_cm.reset()
 
         with torch.no_grad():
             for data, targets in tqdm(loader, desc="Test", leave=False):
@@ -217,16 +196,16 @@ class ModelTrainer:
                 batch_size = data.size(0)
                 _, predicted = torch.max(outputs, 1)
 
-                accuracy_metric.update(preds=predicted, target=targets)
-                f1_metric.update(preds=predicted, target=targets)
-                cm_metric.update(preds=predicted, target=targets)
+                self.test_acc.update(preds=predicted, target=targets)
+                self.test_f1.update(preds=predicted, target=targets)
+                self.test_cm.update(preds=predicted, target=targets)
 
                 running_loss += loss.item() * batch_size
                 total_samples += batch_size
 
-        accuracy = torch.round(accuracy_metric.compute(), decimals=6) * 100
-        f1 = torch.round(f1_metric.compute(), decimals=6) * 100
-        cm = cm_metric.compute()
+        accuracy = torch.round(self.test_acc.compute(), decimals=6) * 100
+        f1 = torch.round(self.test_f1.compute(), decimals=6) * 100
+        cm = self.test_cm.compute()
 
         running_loss = running_loss / total_samples
 
