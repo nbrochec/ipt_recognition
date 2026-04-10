@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 
-from models.layers import LogMelSpectrogramLayer, customConv2d
+from models.layers import LogMelSpectrogramLayer, customConv2d, AdaptivePool2dONNX
 
 class eguitar(nn.Module):
     def __init__(self, output_nbr, args):
@@ -36,7 +36,7 @@ class eguitar(nn.Module):
 
     def _create_cnn_block(self):
          return nn.Sequential(
-            nn.AdaptiveAvgPool2d((128, 15)),
+            AdaptivePool2dONNX((128, 15)),
             customConv2d(1, 64, (2,3), "same"),
             customConv2d(64, 64, (2,3), "same"),
             nn.MaxPool2d((2, 1)),
@@ -116,7 +116,7 @@ class flute(nn.Module):
 
     def _create_cnn_block(self):
         return nn.Sequential(
-            nn.AdaptiveAvgPool2d((384, 112)),
+            AdaptivePool2dONNX((384, 112)),
             customConv2d(3, 40, 4, "same"), 
             nn.MaxPool2d((4, 2)),
             nn.Dropout2d(0.25),

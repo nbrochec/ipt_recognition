@@ -254,7 +254,7 @@ class ModelSaver:
             opset_version=17,
             input_names=["audio"],
             output_names=["logits"],
-            dynamic_axes={"audio": {0: "batch"}, "logits": {0: "batch"}}
+            dynamic_axes={"audio": {0: "batch", 2: "samples"}, "logits": {0: "batch"}}
         )
         print(f"ONNX model has been exported to {os.path.relpath(onnx_path)}.")
 

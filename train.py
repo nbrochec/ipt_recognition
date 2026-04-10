@@ -160,7 +160,9 @@ if __name__ == '__main__':
     scripted_model = script(model)
     scripted_model.save(f'{current_run}/{args.name}_{date}_{time}.ts')
     print(f'TorchScript file has been exported to the {os.path.relpath(current_run)} directory.')
-    ModelSaver.export_to_onnx(model, f'{current_run}/{args.name}_{date}_{time}.onnx', args.segment_length)
+    # ModelSaver.export_to_onnx(model, f'{current_run}/{args.name}_{date}_{time}.onnx', args.segment_length)
+    torch.onnx.export(model, (torch.randn(1, 1, args.segment_length),), f'{current_run}/{args.name}_{date}_{time}.onnx', verbose=False)
+    print(f'ONNX file has been exported to the {os.path.relpath(current_run)} directory.')
 
     log_queue.put(None)
     os._exit(0)
