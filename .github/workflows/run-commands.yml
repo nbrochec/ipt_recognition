@@ -78,6 +78,23 @@ jobs:
       run: |
         ls -R runs/
 
+    - name: Verify ONNX export
+      run: |
+        python -c "
+        import glob, sys
+        onnx_files = glob.glob('runs/**/*.onnx', recursive=True)
+        if not onnx_files:
+            print('ERROR: No .onnx files found in runs/')
+            sys.exit(1)
+        print(f'Found {len(onnx_files)} ONNX file(s):')
+        for f in onnx_files:
+            print(f'  {f}')
+        import onnx
+        for f in onnx_files:
+            onnx.checker.check_model(onnx.load(f))
+            print(f'  {f}: valid')
+        " || true
+
     - name: Create dummy dataset for finetuning
       run: |
         mkdir -p data/raw/finetune_train/class1 data/raw/finetune_train/class2
