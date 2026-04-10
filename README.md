@@ -1,5 +1,7 @@
 # 🎵 Real-Time Instrumental Playing Techniques Recognition
 
+[![CI Validate training pipeline](https://github.com/nbrochec/ipt_recognition/actions/workflows/run-commands.yml/badge.svg)](https://github.com/nbrochec/ipt_recognition/actions/workflows/run-commands.yml)
+
 This repository provides a toolkit for the real-time recognition of instrumental playing techniques using deep learning CNN models. It allows the user to train his own classification model using his personal data. The toolkit also provide pre-trained models for flute and eguitar IPT recognition.
 
 Trained models can be run in real-time in Max/MSP thanks to `ipt~` external object from [ipt_tilde](https://github.com/nbrochec/ipt_tilde) repository.
