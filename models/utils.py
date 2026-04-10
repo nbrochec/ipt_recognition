@@ -239,8 +239,24 @@ class ModelSaver:
         print(
             f"TorchScript file has been exported to the {os.path.relpath(current_run)} directory.")
 
-        # Return 
+        # Return
         return checkpoint_path, torchscript_path
+
+    @staticmethod
+    def export_to_onnx(model, onnx_path, segment_length):
+        model = model.to('cpu')
+        model.eval()
+        dummy_input = torch.randn(1, 1, segment_length)
+        torch.onnx.export(
+            model,
+            dummy_input,
+            onnx_path,
+            opset_version=17,
+            input_names=["audio"],
+            output_names=["logits"],
+            dynamic_axes={"audio": {0: "batch"}, "logits": {0: "batch"}}
+        )
+        print(f"ONNX model has been exported to {os.path.relpath(onnx_path)}.")
 
 
 class PrepareModel:

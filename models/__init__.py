@@ -1,9 +1,9 @@
 from .models import eguitar, flute, base
 from .layers import customConv2d, LogMelSpectrogramLayer
-from .utils import LoadModel, ModelSummary, ModelTester, ModelInit, ModelTrainer, PrepareModel, TestSavedModel, ModelChecker, DeviceName
+from .utils import LoadModel, ModelSummary, ModelTester, ModelInit, ModelTrainer, PrepareModel, TestSavedModel, ModelChecker, DeviceName, ModelSaver
 
 __all__=[
     'eguitar', 'flute', 'base',
     'customConv2d', 'LogMelSpectrogramLayer',
-    'LoadModel', 'ModelSummary', 'ModelTester', 'ModelInit', 'ModelTrainer', 'PrepareModel', 'TestSavedModel', 'ModelChecker', 'DeviceName'
+    'LoadModel', 'ModelSummary', 'ModelTester', 'ModelInit', 'ModelTrainer', 'PrepareModel', 'TestSavedModel', 'ModelChecker', 'DeviceName', 'ModelSaver'
 ]
