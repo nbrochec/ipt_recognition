@@ -1,4 +1,5 @@
 import torch
+import onnx
 import humanize
 import sys
 import os
@@ -256,7 +257,24 @@ class ModelSaver:
             output_names=["logits"],
             dynamic_axes={"audio": {0: "batch", 2: "samples"}, "logits": {0: "batch"}}
         )
+
+        # Embed model metadata (sr, seglen, classnames) into the ONNX file.
+        onnx_model = onnx.load(onnx_path)
+        metadata = {
+            "sr":         str(model.sr),
+            "seglen":     str(model.segment_length),
+            "classnames": ",".join(model.classnames),
+        }
+        for key, value in metadata.items():
+            entry = onnx_model.metadata_props.add()
+            entry.key   = key
+            entry.value = value
+        onnx.save(onnx_model, onnx_path)
+
         print(f"ONNX model has been exported to {os.path.relpath(onnx_path)}.")
+        print(f"  sr        : {metadata['sr']}")
+        print(f"  seglen    : {metadata['seglen']}")
+        print(f"  classnames: {metadata['classnames']}")
 
 
 class PrepareModel:
