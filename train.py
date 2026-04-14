@@ -16,8 +16,8 @@ import torch.nn as nn
 from torch.optim.lr_scheduler import ReduceLROnPlateau
 from tensorboardX import SummaryWriter
 
-from models import *
 from utils import *
+from models import *
 
 def parse_arguments():
     """Parse command-line arguments."""
