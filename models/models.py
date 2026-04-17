@@ -18,11 +18,10 @@ class eguitar(nn.Module):
 
         onnx = getattr(args, 'onnx', 0)
         logmel_cls = LogMelSpectrogramLayerONNX if onnx else LogMelSpectrogramLayer
-        pool_cls = AdaptivePool2dONNX if onnx else nn.AdaptiveAvgPool2d
 
         self.logmel = logmel_cls(sample_rate=self.sr, f_min=self.fmin, f_max=self.fmax, n_mels=self.nmels, n_fft=2048, hop_length=self.hoplength)
 
-        self.cnn = self._create_cnn_block(pool_cls)
+        self.cnn = self._create_cnn_block(AdaptivePool2dONNX)
         self.fc = self._create_fc_block(output_nbr)
 
     def _create_fc_block(self, output_nbr):
@@ -100,13 +99,12 @@ class flute(nn.Module):
 
         onnx = getattr(args, 'onnx', 0)
         logmel_cls = LogMelSpectrogramLayerONNX if onnx else LogMelSpectrogramLayer
-        pool_cls = AdaptivePool2dONNX if onnx else nn.AdaptiveAvgPool2d
 
         self.logmel1 = logmel_cls(sample_rate=self.sr, f_min=self.fmin, f_max=self.fmax, n_mels=self.nmels, n_fft=512, hop_length=self.hoplength)
         self.logmel2 = logmel_cls(sample_rate=self.sr, f_min=self.fmin, f_max=self.fmax, n_mels=self.nmels, n_fft=1024, hop_length=self.hoplength)
         self.logmel3 = logmel_cls(sample_rate=self.sr, f_min=self.fmin, f_max=self.fmax, n_mels=self.nmels, n_fft=2048, hop_length=self.hoplength)
 
-        self.cnn = self._create_cnn_block(pool_cls)
+        self.cnn = self._create_cnn_block(AdaptivePool2dONNX)
         self.fc = self._create_fc_block(output_nbr)
 
     def _create_fc_block(self, output_nbr):
