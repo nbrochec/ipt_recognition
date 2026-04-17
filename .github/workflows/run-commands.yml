@@ -64,11 +64,11 @@ jobs:
         
     - name: Train flute model
       run: |
-        python train.py -n run_flute -d cpu -m flute -sr 16000 --num_workers 2 --batch_size 32 -e 1 --n_mels 128 --n_fft 2048 --hop_length 512 -seglen '1000 ms' || true
+        python train.py -n run_flute -d cpu -m flute -sr 16000 --num_workers 2 --batch_size 32 -e 1 --n_mels 128 --n_fft 2048 --hop_length 512 -seglen '1000 ms' --onnx 1 || true
 
     - name: Train eguitar model
       run: |
-        python train.py -n run_eguitar -d cpu -m eguitar -sr 16000 --num_workers 2 --batch_size 32 -e 1 --n_mels 128 --n_fft 2048 --hop_length 512 -seglen '1000 ms' || true
+        python train.py -n run_eguitar -d cpu -m eguitar -sr 16000 --num_workers 2 --batch_size 32 -e 1 --n_mels 128 --n_fft 2048 --hop_length 512 -seglen '1000 ms' --onnx 1 || true
 
     - name: Train from cfg
       run: |
