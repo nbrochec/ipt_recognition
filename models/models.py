@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 
-from models.layers import LogMelSpectrogramLayer, customConv2d, AdaptivePool2dONNX
+from models.layers import LogMelSpectrogramLayer, LogMelSpectrogramLayerONNX, customConv2d, AdaptivePool2dONNX
 
 class eguitar(nn.Module):
     def __init__(self, output_nbr, args):
@@ -16,9 +16,13 @@ class eguitar(nn.Module):
         self.nmels = args.n_mels
         self.hoplength = args.hop_length
 
-        self.logmel = LogMelSpectrogramLayer(sample_rate=self.sr, f_min=self.fmin, f_max=self.fmax, n_mels=self.nmels, n_fft=2048, hop_length=self.hoplength)
+        onnx = getattr(args, 'onnx', 0)
+        logmel_cls = LogMelSpectrogramLayerONNX if onnx else LogMelSpectrogramLayer
+        pool_cls = AdaptivePool2dONNX if onnx else nn.AdaptiveAvgPool2d
 
-        self.cnn = self._create_cnn_block()
+        self.logmel = logmel_cls(sample_rate=self.sr, f_min=self.fmin, f_max=self.fmax, n_mels=self.nmels, n_fft=2048, hop_length=self.hoplength)
+
+        self.cnn = self._create_cnn_block(pool_cls)
         self.fc = self._create_fc_block(output_nbr)
 
     def _create_fc_block(self, output_nbr):
@@ -34,9 +38,9 @@ class eguitar(nn.Module):
             nn.Linear(128, output_nbr),
         )
 
-    def _create_cnn_block(self):
+    def _create_cnn_block(self, pool_cls):
          return nn.Sequential(
-            AdaptivePool2dONNX((128, 15)),
+            pool_cls((128, 15)),
             customConv2d(1, 64, (2,3), "same"),
             customConv2d(64, 64, (2,3), "same"),
             nn.MaxPool2d((2, 1)),
@@ -94,11 +98,15 @@ class flute(nn.Module):
         self.nmels = args.n_mels
         self.hoplength = args.hop_length
 
-        self.logmel1 = LogMelSpectrogramLayer(sample_rate=self.sr, f_min=self.fmin, f_max=self.fmax, n_mels=self.nmels, n_fft=512, hop_length=self.hoplength)
-        self.logmel2 = LogMelSpectrogramLayer(sample_rate=self.sr, f_min=self.fmin, f_max=self.fmax, n_mels=self.nmels, n_fft=1024, hop_length=self.hoplength)
-        self.logmel3 = LogMelSpectrogramLayer(sample_rate=self.sr, f_min=self.fmin, f_max=self.fmax, n_mels=self.nmels, n_fft=2048, hop_length=self.hoplength)
-        
-        self.cnn = self._create_cnn_block()
+        onnx = getattr(args, 'onnx', 0)
+        logmel_cls = LogMelSpectrogramLayerONNX if onnx else LogMelSpectrogramLayer
+        pool_cls = AdaptivePool2dONNX if onnx else nn.AdaptiveAvgPool2d
+
+        self.logmel1 = logmel_cls(sample_rate=self.sr, f_min=self.fmin, f_max=self.fmax, n_mels=self.nmels, n_fft=512, hop_length=self.hoplength)
+        self.logmel2 = logmel_cls(sample_rate=self.sr, f_min=self.fmin, f_max=self.fmax, n_mels=self.nmels, n_fft=1024, hop_length=self.hoplength)
+        self.logmel3 = logmel_cls(sample_rate=self.sr, f_min=self.fmin, f_max=self.fmax, n_mels=self.nmels, n_fft=2048, hop_length=self.hoplength)
+
+        self.cnn = self._create_cnn_block(pool_cls)
         self.fc = self._create_fc_block(output_nbr)
 
     def _create_fc_block(self, output_nbr):
@@ -114,9 +122,9 @@ class flute(nn.Module):
                 nn.Linear(40, output_nbr)
             )
 
-    def _create_cnn_block(self):
+    def _create_cnn_block(self, pool_cls):
         return nn.Sequential(
-            AdaptivePool2dONNX((384, 112)),
+            pool_cls((384, 112)),
             customConv2d(3, 40, 4, "same"), 
             nn.MaxPool2d((4, 2)),
             nn.Dropout2d(0.25),
@@ -168,10 +176,13 @@ class base(nn.Module):
         self.nmels = args.n_mels
         self.hoplength = args.hop_length
 
-        self.logmel1 = LogMelSpectrogramLayer(sample_rate=self.sr, f_min=self.fmin, f_max=self.fmax, n_mels=self.nmels, n_fft=512, hop_length=self.hoplength)
-        self.logmel2 = LogMelSpectrogramLayer(sample_rate=self.sr, f_min=self.fmin, f_max=self.fmax, n_mels=self.nmels, n_fft=1024, hop_length=self.hoplength)
-        self.logmel3 = LogMelSpectrogramLayer(sample_rate=self.sr, f_min=self.fmin, f_max=self.fmax, n_mels=self.nmels, n_fft=2048, hop_length=self.hoplength)
-        
+        onnx = getattr(args, 'onnx', 0)
+        logmel_cls = LogMelSpectrogramLayerONNX if onnx else LogMelSpectrogramLayer
+
+        self.logmel1 = logmel_cls(sample_rate=self.sr, f_min=self.fmin, f_max=self.fmax, n_mels=self.nmels, n_fft=512, hop_length=self.hoplength)
+        self.logmel2 = logmel_cls(sample_rate=self.sr, f_min=self.fmin, f_max=self.fmax, n_mels=self.nmels, n_fft=1024, hop_length=self.hoplength)
+        self.logmel3 = logmel_cls(sample_rate=self.sr, f_min=self.fmin, f_max=self.fmax, n_mels=self.nmels, n_fft=2048, hop_length=self.hoplength)
+
         self.cnn1 = self._create_cnn_block()
 
         self.fc = nn.Sequential(

@@ -114,6 +114,7 @@ You can use the following arguments if you want to test different configurations
 | `--num_workers`     | Number of workers for data loading.                                | Integer value > `0`            | `4`            |
 | `--early_stopping`  | Number of epochs without improvement before early stopping.         | Integer value > `0`   |        |
 | `--reduce_lr`        | Reduce learning rate if validation plateaus.                       | `0` or `1`             |     `0`    |
+| `--onnx`             | Export model to ONNX format after training.                        | `0` or `1`             |     `0`    |
 
 You can also pass a `.yaml` configuration file using `--config` argument:
 ```bash
@@ -141,6 +142,7 @@ After training, the following files will be created:
 In `/runs/your_project_name_date_time/`:
 - Model checkpoints (`.pth`)
 - Torchscript model (`.ts`)
+- ONNX model (`.onnx`) — only if `--onnx 1` was passed
 - Configuration (`.yaml`)
 
 In `/logs/your_project_name_date_time/`:

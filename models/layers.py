@@ -1,13 +1,62 @@
-import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+import torchaudio.transforms as Taudio
 import torchaudio.functional as Faudio
+
 
 class LogMelSpectrogramLayer(nn.Module):
     """Implement a custom layer that processes a normalized Log-Mel-Spectrogram analysis."""
     def __init__(self, sample_rate=44100, n_fft=2048, win_length=None, hop_length=512, n_mels=128, f_min=20, f_max=None, center=True):
         super(LogMelSpectrogramLayer, self).__init__()
+        self.sample_rate = sample_rate
+        self.n_fft = n_fft
+        self.win_length = win_length if win_length is not None else n_fft
+        self.hop_length = hop_length
+        self.n_mels = n_mels
+        self.f_min = f_min
+        self.f_max = f_max
+        self.center = center
+
+        self.mel_scale = Taudio.MelSpectrogram(
+            sample_rate=self.sample_rate,
+            n_fft=self.n_fft,
+            win_length=self.win_length,
+            hop_length=self.hop_length,
+            n_mels=self.n_mels,
+            f_min=self.f_min,
+            f_max=self.f_max,
+            center=self.center,
+        )
+
+        self.amplitude_to_db = Taudio.AmplitudeToDB(stype='power')
+
+    def min_max_normalize(self, tensor: torch.Tensor, min_val: float = 0.0, max_val: float = 1.0) -> torch.Tensor:
+        """Normalizes the input tensor to the specified range [min_val, max_val]."""
+        min_tensor = torch.as_tensor(min_val, dtype=tensor.dtype, device=tensor.device)
+        max_tensor = torch.as_tensor(max_val, dtype=tensor.dtype, device=tensor.device)
+        eps = 1e-9
+
+        t_min = tensor.min()
+        t_max = tensor.max()
+
+        t_range = t_max - t_min + eps
+        normalized_tensor = (tensor - t_min) / t_range
+
+        scaled_tensor = normalized_tensor * (max_tensor - min_tensor) + min_tensor
+        return scaled_tensor
+
+    def forward(self, x):
+        x = self.mel_scale(x)
+        x = self.amplitude_to_db(x)
+        x = self.min_max_normalize(x)
+        return x.to(torch.float32)
+
+
+class LogMelSpectrogramLayerONNX(nn.Module):
+    """ONNX-compatible Log-Mel-Spectrogram layer using manual STFT pipeline."""
+    def __init__(self, sample_rate=44100, n_fft=2048, win_length=None, hop_length=512, n_mels=128, f_min=20, f_max=None, center=True):
+        super(LogMelSpectrogramLayerONNX, self).__init__()
         self.n_fft = n_fft
         self.win_length = win_length if win_length is not None else n_fft
         self.hop_length = hop_length
@@ -70,7 +119,9 @@ class LogMelSpectrogramLayer(nn.Module):
         mel_db = self.min_max_normalize(mel_db)
         return mel_db.to(torch.float32)
 
+
 class AdaptivePool2dONNX(nn.Module):
+    """ONNX-compatible replacement for nn.AdaptiveAvgPool2d."""
     def __init__(self, output_size):
         super().__init__()
         if isinstance(output_size, int):
@@ -84,22 +135,23 @@ class AdaptivePool2dONNX(nn.Module):
 
         pad_h = max(0, h_out - h_in)
         pad_w = max(0, w_out - w_in)
-        
+
         if pad_h > 0 or pad_w > 0:
             x = F.pad(x, (0, pad_w, 0, pad_h))
             h_in, w_in = x.shape[-2], x.shape[-1]
 
         stride_h = max(1, h_in // h_out)
         stride_w = max(1, w_in // w_out)
-        
+
         kernel_h = h_in - (h_out - 1) * stride_h
         kernel_w = w_in - (w_out - 1) * stride_w
 
         return F.avg_pool2d(
-            x, 
-            kernel_size=(int(kernel_h), int(kernel_w)), 
+            x,
+            kernel_size=(int(kernel_h), int(kernel_w)),
             stride=(int(stride_h), int(stride_w))
         )
+
 
 class customConv2d(nn.Module):
     def __init__(self, input_channels, output_channels, kernel_size, padding):

@@ -40,6 +40,7 @@ def parse_arguments():
     parser.add_argument('--num_workers', type=int, help='Number of workers for data loading.', default=4)
     parser.add_argument('-seglen','--segment_length', type=str, help='Defines segment length of audio data samples.', default='14700 samps')
     parser.add_argument('-cfg', '--config', type=str, help='Specify YAML file path.')
+    parser.add_argument('--onnx', type=int, default=0, help='Export model to ONNX format after training (1 to enable, 0 to disable).')
 
     args = parser.parse_args()
     return args
@@ -160,9 +161,8 @@ if __name__ == '__main__':
     scripted_model = script(model)
     scripted_model.save(f'{current_run}/{args.name}_{date}_{time}.ts')
     print(f'TorchScript file has been exported to the {os.path.relpath(current_run)} directory.')
-    # ModelSaver.export_to_onnx(model, f'{current_run}/{args.name}_{date}_{time}.onnx', args.segment_length)
-    torch.onnx.export(model, (torch.randn(1, 1, args.segment_length),), f'{current_run}/{args.name}_{date}_{time}.onnx', verbose=False)
-    print(f'ONNX file has been exported to the {os.path.relpath(current_run)} directory.')
+    if args.onnx:
+        ModelSaver.export_to_onnx(model, f'{current_run}/{args.name}_{date}_{time}.onnx', args.segment_length)
 
     log_queue.put(None)
     os._exit(0)
