@@ -79,7 +79,7 @@ if __name__ == '__main__':
     args.class_names, args.num_classes = CSVDataset.get_names_and_nbr(csv_file_path)
 
     dataPreparator = PrepareData(args, csv_file_path)
-    train_loader, test_loader, val_loader = dataPreparator.prepare()
+    train_loader, val_loader = dataPreparator.prepare()
 
     date = datetime.datetime.now().strftime('%Y%m%d')
     time = datetime.datetime.now().strftime('%H%M%S')

@@ -40,12 +40,12 @@ class PrepareData:
         df_parquet = pl.read_parquet(self.parquet).to_pandas()
 
         train_loader = DataLoader(CustomTrainDataset(df_parquet), batch_sampler=batch_sampler, num_workers=self.args.num_workers, prefetch_factor=2, pin_memory=True)
-        test_loader = DataLoader(CustomTestDataset(df_parquet), batch_size=self.args.batch_size, shuffle=True, num_workers=self.args.num_workers, prefetch_factor=2, pin_memory=True)
+        # test_loader = DataLoader(CustomTestDataset(df_parquet), batch_size=self.args.batch_size, shuffle=True, num_workers=self.args.num_workers, prefetch_factor=2, pin_memory=True)
         val_loader = DataLoader(CustomValDataset(df_parquet), batch_size=self.args.batch_size, shuffle=True, num_workers=self.args.num_workers, prefetch_factor=2, pin_memory=True)
 
         print('Data successfully loaded into DataLoaders.')
 
-        return train_loader, test_loader, val_loader
+        return train_loader, val_loader
 
 class CustomTrainDataset(Dataset):
     def __init__(self, df, transform=None):
