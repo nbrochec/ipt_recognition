@@ -1,10 +1,10 @@
-name: CI Validate training pipeline
+name: CI Research — Validate training pipeline
 
 on:
   push:
-    branches: [ main ]
+    branches: [ research ]
   pull_request:
-    branches: [ main ]
+    branches: [ research ]
   workflow_dispatch:
 
 jobs:
