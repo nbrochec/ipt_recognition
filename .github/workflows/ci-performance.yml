@@ -24,7 +24,7 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
-    - name: Create dummy dataset
+    - name: Create dummy dataset for flute
       run: |
         mkdir -p data/raw/train/class1 data/raw/train/class2
 
@@ -42,9 +42,29 @@ jobs:
             sf.write(f'data/raw/train/class2/sample_{i}.wav', signal_class2, sample_rate)
         "
 
-    - name: Preprocess dataset
+    - name: Preprocess dataset for flute
       run: |
         python preprocess.py -n run_flute --train_dir train -sr 16000 -seglen '1000 ms'
+
+    - name: Recreate dummy dataset for eguitar
+      run: |
+        mkdir -p data/raw/train/class1 data/raw/train/class2
+        python -c "
+        import numpy as np
+        import soundfile as sf
+
+        for i in range(20):
+            sample_rate = 16000
+            duration = 1.0
+            t = np.linspace(0, duration, int(sample_rate * duration))
+            signal_class1 = np.sin(2 * np.pi * 440 * t)
+            signal_class2 = np.random.normal(0, 1, len(t))
+            sf.write(f'data/raw/train/class1/sample_{i}.wav', signal_class1, sample_rate)
+            sf.write(f'data/raw/train/class2/sample_{i}.wav', signal_class2, sample_rate)
+        "
+
+    - name: Preprocess dataset for eguitar
+      run: |
         python preprocess.py -n run_eguitar --train_dir train -sr 16000 -seglen '1000 ms'
 
     - name: Train flute model
