@@ -1,6 +1,6 @@
 # 🎵 Real-Time Instrumental Playing Techniques Recognition
 
-[![CI Performance](https://github.com/nbrochec/ipt_recognition/actions/workflows/ci-performance.yml/badge.svg)](https://github.com/nbrochec/ipt_recognition/actions/workflows/ci-performance.yml)
+[![CI Research](https://github.com/nbrochec/ipt_recognition/actions/workflows/ci-research.yml/badge.svg?branch=research)](https://github.com/nbrochec/ipt_recognition/actions/workflows/ci-research.yml)
 
 This repository provides a toolkit for the real-time recognition of instrumental playing techniques using deep learning CNN models. It allows the user to train his own classification model using his personal data. The toolkit also provide pre-trained models for flute and eguitar IPT recognition.
 
