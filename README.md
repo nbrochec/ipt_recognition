@@ -2,11 +2,17 @@
 
 [![CI Validate training pipeline](https://github.com/nbrochec/ipt_recognition/actions/workflows/run-commands.yml/badge.svg)](https://github.com/nbrochec/ipt_recognition/actions/workflows/run-commands.yml)
 
-This repository provides a toolkit for the real-time recognition of instrumental playing techniques using deep learning CNN models. It allows the user to train his own classification model using his personal data. The toolkit also provide pre-trained models for flute and eguitar IPT recognition.
+This repository provides a toolkit for the real-time recognition of instrumental playing techniques using deep learning CNN models. It allows the user to train a classification model from their own audio data. The toolkit also provides pre-trained models for flute and eguitar IPT recognition.
 
 Trained models can be run in real-time in Max/MSP thanks to `ipt~` external object from [ipt_tilde](https://github.com/nbrochec/ipt_tilde) repository.
 
 This repository is a core component of **SPIRIT** (System for Real-Time Recognition of Instrumental Playing Techniques).
+
+## 🌿 Branches
+| Branch | Purpose |
+|--------|---------|
+| `performance` | Simplified pipeline for performers — provide a single audio folder, the system handles everything |
+| `research` | Extended pipeline with separate train/test/val folders and detailed evaluation metrics |
 
 ## 🚀 Installation
 Clone this repository, navigate to the folder, create a conda environment with Python 3.11.7, and install requirements.
@@ -27,9 +33,7 @@ Non-expert users: we recommend you to use our Jupyter Notebook `train.ipynb`
     └── 📁dataset       # Dataset CSV files
     └── 📁preprocessed  # Preprocessed audio files
     └── 📁raw           # Raw audio files
-        └── 📁test      # Test dataset
-        └── 📁train     # Training dataset
-        └── 📁val       # Validation dataset (optional)
+        └── 📁train     # Your audio files (train/test/val split is automatic)
 └── 📁models            # Model architectures
 └── 📁pre-trained       # Pre-trained models
 └── 📁utils             # Utility functions
@@ -37,7 +41,7 @@ Non-expert users: we recommend you to use our Jupyter Notebook `train.ipynb`
 
 ## 📦 Usage
 ### 📂 Dataset Preparation
-Place your training audio files in `/data/raw/train/` and test files in `/data/raw/test/` (val files is also possible in `/data/raw/val/`). Each IPT class should have its own folder with the same name in both train, test and val directories.
+Place all your audio files in `/data/raw/train/`. Each IPT class should have its own sub-folder. The system will automatically split the data into 80% train, 10% test and 10% validation.
 
 Example structure:
 ```
@@ -49,8 +53,6 @@ Example structure:
         └── audiofile1.wav
         └── audiofile2.wav
 ```
-
-You can use multiple training datasets. They must share the same names for IPT classes.
 
 ### 🔄 Preprocess your datasets
 Use `screen` to access multiple separate login session insde a single terminal window.
@@ -69,20 +71,15 @@ python preprocess.py --name your_project_name
 | Argument            | Description                                                         | Possible Values                | Default Value   |
 |---------------------|---------------------------------------------------------------------|--------------------------------|-----------------|
 | `-n`, `--name`      | Name of the project.                                                | String                         |          |
-| `-sr`, `--sampling_rate` | Sampling rate for downsampling the audio files.                     | Integer (Hz) > `0`             | `44100`         |
-| `--train_dir` | Directory of training samples to preprocess.                        | String                       | `train`         |
-| `--test_dir`  | Directory of test samples to preprocess.                           | String                        | `test`          |
-| `--val_dir`   | Directory of validation samples to preprocess.                    | String                         | `None`          |
-| `--val_split` | Specify on which dataset the validation split would be made.      | `train`, `test`                | `train`         |
-| `--val_ratio` | Amount of validation samples.                                       | `0` < Float value < `1`         | `0.2`           |
-| `--offline_augment` | Use offline augmentations to generate data using detuning, gaussian noise and time stretching from original audio files. | `0` or `1` | `1` |
-| `--use_original`       | Use original data as training data.                             | `0` or `1`               | `1`        |
-| `--segment_length`  | Defines segment length of audio data samples. You should precise either if it is samples `samps` or millisecond `ms` | String | `"14700 samps"` |
-| `--padding`         | Pad the arrays of audio samples with zeros. `minimal` only pads when audio file length is shorter than required input length. `full` pads any segment that has less than the required input length. | `full`, `minimal`, `None`  | `minimal`           |
-
+| `-sr`, `--sampling_rate` | Sampling rate for downsampling the audio files.                | Integer (Hz) > `0`             | `44100`         |
+| `--train_dir`       | Directory containing all audio samples.                            | String                         | `train`         |
+| `--test_ratio`      | Fraction of data to use for the test set.                          | `0` < Float < `1`              | `0.1`           |
+| `--val_ratio`       | Fraction of data to use for the validation set.                    | `0` < Float < `1`              | `0.1`           |
+| `--use_original`    | Use original data as training data.                                | `0` or `1`                     | `1`             |
+| `--segment_length`  | Defines segment length of audio data samples. Specify unit as `samps` or `ms`. | String          | `"14700 samps"` |
+| `--padding`         | Pad the arrays of audio samples with zeros. `minimal` only pads when audio file length is shorter than required input length. `full` pads any segment that has less than the required input length. | `full`, `minimal`, `None`  | `minimal` |
 
 Notes:
-- If `--val_dir` is not specified, the validation set will be generated from the folder specified with `--val_split`
 - Downsampling audio files is recommended, use `--sampling_rate` argument for that purpose
 - Preprocessed audio files will be saved to `/data/preprocessed` folder
 - A CSV file will be saved in the `/data/dataset/` folder with the following syntax: `your_project_name_dataset_split.csv`
@@ -144,10 +141,6 @@ In `/runs/your_project_name_date_time/`:
 - Torchscript model (`.ts`)
 - ONNX model (`.onnx`) — only if `--onnx 1` was passed
 - Configuration (`.yaml`)
-
-In `/logs/your_project_name_date_time/`:
-- Confusion matrix (`.csv`)
-- Results (`.csv`)
 
 ## 🎯 Finetuning
 
