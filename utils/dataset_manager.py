@@ -156,16 +156,16 @@ class DatasetMaker:
         self.name = args.name
         self.train_path = os.path.join(self.data_dir, 'preprocessed', args.name, args.train_dir)
         self.test_path = os.path.join(self.data_dir, 'preprocessed', args.name, args.test_dir)
-        self.val_path = os.path.join(self.data_dir, 'preprocessed', args.name, args.val_dir) if args.val_dir is not None else None
+        self.val_path = os.path.join(self.data_dir, 'preprocessed', args.name, args.val_dir)
         self.csv_path = os.path.join(self.destination, f'{self.name}_dataset_split.csv')
         self.parquet_path = os.path.join(self.destination, f'{self.name}_dataset_split.parquet')
 
     def make(self):
-        all_files = {'train': self._scan_dir(self.train_path), 'test': self._scan_dir(self.test_path)}
-        if self.val_path is not None:
-            all_files['val'] = self._scan_dir(self.val_path)
-        else:
-            all_files['val'] = {}
+        all_files = {
+            'train': self._scan_dir(self.train_path),
+            'test': self._scan_dir(self.test_path),
+            'val': self._scan_dir(self.val_path),
+        }
             
         label_to_index = {label: idx for idx, label in enumerate(sorted(all_files['train'].keys()))}
 
@@ -217,81 +217,61 @@ class DatasetSplitter:
     def __init__(self, args):
         self.args = args
         self.base_dir = os.path.join('data', 'raw')
-        self.train_dir = os.path.join(self.base_dir, args.train_dir) 
-        self.test_dir = os.path.join(self.base_dir, args.test_dir) 
-        self.val_dir = os.path.join(self.base_dir, args.val_dir) if args.val_dir is not None else None
+        self.source_dir = os.path.join(self.base_dir, args.train_dir)
+        self.test_ratio = args.test_ratio
         self.val_ratio = args.val_ratio
-        self.val_split = args.val_split
         self.name = args.name
 
     def split(self):
-        if not self.val_dir:
-            print("Validation directory not specified, splitting data for validatation set...")
-            val_dir = os.path.join('data', 'raw', f'val_{self.name}')
-            DirectoryManager.ensure_dir_exists(val_dir)
-            
-            if self.val_split == 'train':
-                source_dir = self.train_dir
-            elif self.val_split == 'test':
-                source_dir = self.test_dir
-            else:
-                raise ValueError("val_split must be 'train' or 'test'")
-            
-            self.args.val_dir = f'val_{self.name}'
-            self._split_data(source_dir)
-        else:
-            print("Validation directory specified, abort dataset splitting...")
-    
-    def _split_data(self, source_dir):
+        print(f"Splitting {self.args.train_dir} into train/test/val (80/{int(self.test_ratio*100)}/{int(self.val_ratio*100)})...")
+
         all_files = []
         labels = []
-        
-        print(f"Checking directory: {source_dir}")
-        print(f"Contents: {os.listdir(source_dir)}")
-        
-        def process_directory(dir_path, current_class=None):
-            """Fonction récursive pour traiter les répertoires"""
+
+        def collect(dir_path):
             for item in os.listdir(dir_path):
                 item_path = os.path.join(dir_path, item)
                 if not os.path.isdir(item_path):
                     continue
-                
                 audio_files = [f for f in os.listdir(item_path) if f.endswith(('.wav', '.mp3', '.flac', '.aiff', '.aif'))]
                 if audio_files:
-                    print(f"\nProcessing class: {item}")
-                    print(f"Class path: {item_path}")
-                    print(f"Found {len(audio_files)} audio files")
-                    all_files.extend([(f, item) for f in audio_files])
+                    all_files.extend([(item_path, f, item) for f in audio_files])
                     labels.extend([item] * len(audio_files))
                 else:
-                    print(f"\nFound bank: {item}")
-                    process_directory(item_path)
-        
-        process_directory(source_dir)
-        
+                    collect(item_path)
+
+        collect(self.source_dir)
+
         if not all_files:
-            raise ValueError(f"No audio files found in {source_dir}.")
-        
-        print(f"\nTotal files found: {len(all_files)}")
-        _, val_files = train_test_split(all_files, test_size=self.val_ratio, random_state=42, stratify=labels)
-        print(f"Files selected for validation: {len(val_files)}")
-        
-        for file, class_name in val_files:
-            found = False
-            for root, _, files in os.walk(source_dir):
-                if file in files and os.path.basename(root) == class_name:
-                    src_path = os.path.join(root, file)
-                    val_class_dir = os.path.join(self.base_dir, f'val_{self.name}', class_name)
-                    DirectoryManager.ensure_dir_exists(val_class_dir)
-                    
-                    dst_path = os.path.join(val_class_dir, file)
-                    shutil.move(src_path, dst_path)
-                    print(f"Moved {os.path.relpath(src_path, source_dir)} to validation set")
-                    found = True
-                    break
-            
-            if not found:
-                print(f"Warning: Could not find {file} in class {class_name}")
+            raise ValueError(f"No audio files found in {self.source_dir}.")
+
+        print(f"Total files found: {len(all_files)}")
+
+        train_val, test_files, train_val_labels, _ = train_test_split(
+            all_files, labels, test_size=self.test_ratio, random_state=42, stratify=labels)
+        val_size = self.val_ratio / (1.0 - self.test_ratio)
+        train_files, val_files, _, _ = train_test_split(
+            train_val, train_val_labels, test_size=val_size, random_state=42, stratify=train_val_labels)
+
+        test_dir_name = f'test_{self.name}'
+        val_dir_name = f'val_{self.name}'
+        train_dir_name = f'train_{self.name}'
+
+        self._move_files(train_files, train_dir_name)
+        self._move_files(test_files, test_dir_name)
+        self._move_files(val_files, val_dir_name)
+
+        self.args.train_dir = train_dir_name
+        self.args.test_dir = test_dir_name
+        self.args.val_dir = val_dir_name
+
+        print(f"Split complete — train: {len(train_files)}, test: {len(test_files)}, val: {len(val_files)}")
+
+    def _move_files(self, files, dest_dir_name):
+        for src_dir, filename, class_name in files:
+            dst_class_dir = os.path.join(self.base_dir, dest_dir_name, class_name)
+            DirectoryManager.ensure_dir_exists(dst_class_dir)
+            shutil.move(os.path.join(src_dir, filename), os.path.join(dst_class_dir, filename))
 
 class DatasetValidator:
     def __init__(self, csv_file):

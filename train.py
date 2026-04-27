@@ -146,13 +146,11 @@ if __name__ == '__main__':
     
     model.load_state_dict(best_state)
 
-    stkd_mtrs, cm = trainer.test_model(test_loader)
-
-    ToTensorboard.upload(stkd_mtrs, cm, csv_file_path, log_queue)
-    print(f'Results and Confusion Matrix have been uploaded to tensorboard.')
-
-    ToDisk.save(args, stkd_mtrs, cm, csv_file_path, current_run)
-    print(f'Results and Confusion Matrix have been saved in the logs/{os.path.basename(current_run)} directory.')
+    # stkd_mtrs, cm = trainer.test_model(test_loader)
+    # ToTensorboard.upload(stkd_mtrs, cm, csv_file_path, log_queue)
+    # print(f'Results and Confusion Matrix have been uploaded to tensorboard.')
+    # ToDisk.save(args, stkd_mtrs, cm, csv_file_path, current_run)
+    # print(f'Results and Confusion Matrix have been saved in the logs/{os.path.basename(current_run)} directory.')
 
     torch.save(model.state_dict(), f'{current_run}/{args.name}_{date}_{time}.pth')
     print(f'Checkpoints has been saved in the {os.path.relpath(current_run)} directory.')
