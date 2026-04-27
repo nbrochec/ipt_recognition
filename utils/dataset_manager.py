@@ -155,7 +155,6 @@ class DatasetMaker:
         self.destination = os.path.join(self.data_dir, 'dataset')
         self.name = args.name
         self.train_path = os.path.join(self.data_dir, 'preprocessed', args.name, args.train_dir)
-        self.test_path = os.path.join(self.data_dir, 'preprocessed', args.name, args.test_dir)
         self.val_path = os.path.join(self.data_dir, 'preprocessed', args.name, args.val_dir)
         self.csv_path = os.path.join(self.destination, f'{self.name}_dataset_split.csv')
         self.parquet_path = os.path.join(self.destination, f'{self.name}_dataset_split.parquet')
@@ -163,17 +162,16 @@ class DatasetMaker:
     def make(self):
         all_files = {
             'train': self._scan_dir(self.train_path),
-            'test': self._scan_dir(self.test_path),
             'val': self._scan_dir(self.val_path),
         }
-            
+
         label_to_index = {label: idx for idx, label in enumerate(sorted(all_files['train'].keys()))}
 
         with open(self.csv_path, mode='w', newline='') as csv_file:
             writer = csv.writer(csv_file)
             writer.writerow(['file_path', 'label_name', 'label_index', 'set'])
 
-            for set_type in ['train', 'test', 'val']:
+            for set_type in ['train', 'val']:
                 self._process_files(writer, all_files[set_type], label_to_index, set_type)
 
         self._convert_to_parquet()
@@ -218,12 +216,11 @@ class DatasetSplitter:
         self.args = args
         self.base_dir = os.path.join('data', 'raw')
         self.source_dir = os.path.join(self.base_dir, args.train_dir)
-        self.test_ratio = args.test_ratio
         self.val_ratio = args.val_ratio
         self.name = args.name
 
     def split(self):
-        print(f"Splitting {self.args.train_dir} into train/test/val (80/{int(self.test_ratio*100)}/{int(self.val_ratio*100)})...")
+        print(f"Splitting {self.args.train_dir} into train/val ({int((1-self.val_ratio)*100)}/{int(self.val_ratio*100)})...")
 
         all_files = []
         labels = []
@@ -247,25 +244,19 @@ class DatasetSplitter:
 
         print(f"Total files found: {len(all_files)}")
 
-        train_val, test_files, train_val_labels, _ = train_test_split(
-            all_files, labels, test_size=self.test_ratio, random_state=42, stratify=labels)
-        val_size = self.val_ratio / (1.0 - self.test_ratio)
         train_files, val_files, _, _ = train_test_split(
-            train_val, train_val_labels, test_size=val_size, random_state=42, stratify=train_val_labels)
+            all_files, labels, test_size=self.val_ratio, random_state=42, stratify=labels)
 
-        test_dir_name = f'test_{self.name}'
         val_dir_name = f'val_{self.name}'
         train_dir_name = f'train_{self.name}'
 
         self._move_files(train_files, train_dir_name)
-        self._move_files(test_files, test_dir_name)
         self._move_files(val_files, val_dir_name)
 
         self.args.train_dir = train_dir_name
-        self.args.test_dir = test_dir_name
         self.args.val_dir = val_dir_name
 
-        print(f"Split complete — train: {len(train_files)}, test: {len(test_files)}, val: {len(val_files)}")
+        print(f"Split complete: train {len(train_files)}, val {len(val_files)}")
 
     def _move_files(self, files, dest_dir_name):
         for src_dir, filename, class_name in files:

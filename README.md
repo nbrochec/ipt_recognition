@@ -8,6 +8,12 @@ Trained models can be run in real-time in Max/MSP thanks to `ipt~` external obje
 
 This repository is a core component of **SPIRIT** (System for Real-Time Recognition of Instrumental Playing Techniques).
 
+## 🌿 Branches
+| Branch | Purpose |
+|--------|---------|
+| `performance` | Simplified pipeline for performers. Provide a single audio folder, the system handles everything |
+| `research` | Extended pipeline with separate train/test/val folders and detailed evaluation metrics |
+
 ## 🚀 Installation
 Clone this repository, navigate to the folder, create a conda environment with Python 3.11.7, and install requirements.
 ```bash
@@ -22,26 +28,23 @@ Non-expert users: we recommend you to use our Jupyter Notebook `train.ipynb`
 
 ## 📁 Main Folders
 ```
-└── 📁config            # Configuration files
-└── 📁data              # Dataset and preprocessed data
-    └── 📁dataset       # Dataset CSV files
-    └── 📁preprocessed  # Preprocessed audio files
-    └── 📁raw           # Raw audio files
-        └── 📁test      # Test dataset
-        └── 📁train     # Training dataset
-        └── 📁val       # Validation dataset (optional)
-└── 📁models            # Model architectures
-└── 📁pre-trained       # Pre-trained models
-└── 📁utils             # Utility functions
+└── 📁config                        # Configuration files
+└── 📁data                          # Dataset and preprocessed data
+    └── 📁dataset                   # Dataset CSV files
+    └── 📁preprocessed              # Preprocessed audio files
+    └── 📁raw                       # Raw audio files
+└── 📁models                        # Model architectures
+└── 📁pre-trained                   # Pre-trained models
+└── 📁utils                         # Utility functions
 ```
 
 ## 📦 Usage
 ### 📂 Dataset Preparation
-Place your training audio files in `/data/raw/train/` and test files in `/data/raw/test/` (val files is also possible in `/data/raw/val/`). Each IPT class should have its own folder with the same name in both train, test and val directories.
+Place your data folder of your audio files in `/data/raw/`. Each IPT class **must** have its own sub-folder.
 
-Example structure:
+Example:
 ```
-└── 📁train
+└── 📁your_data_folder
     └── 📁IPTclass_1
         └── audiofile1.wav
         └── audiofile2.wav
@@ -49,8 +52,6 @@ Example structure:
         └── audiofile1.wav
         └── audiofile2.wav
 ```
-
-You can use multiple training datasets. They must share the same names for IPT classes.
 
 ### 🔄 Preprocess your datasets
 Use `screen` to access multiple separate login session insde a single terminal window.
@@ -63,7 +64,7 @@ cd ipt_recognition
 
 Preprocess your datasets:
 ```bash
-python preprocess.py --name your_project_name
+python preprocess.py --name your_project_name --train_dir your_data_folder
 ```
 
 | Argument            | Description                                                         | Possible Values                | Default Value   |
@@ -71,9 +72,6 @@ python preprocess.py --name your_project_name
 | `-n`, `--name`      | Name of the project.                                                | String                         |          |
 | `-sr`, `--sampling_rate` | Sampling rate for downsampling the audio files.                     | Integer (Hz) > `0`             | `44100`         |
 | `--train_dir` | Directory of training samples to preprocess.                        | String                       | `train`         |
-| `--test_dir`  | Directory of test samples to preprocess.                           | String                        | `test`          |
-| `--val_dir`   | Directory of validation samples to preprocess.                    | String                         | `None`          |
-| `--val_split` | Specify on which dataset the validation split would be made.      | `train`, `test`                | `train`         |
 | `--val_ratio` | Amount of validation samples.                                       | `0` < Float value < `1`         | `0.2`           |
 | `--offline_augment` | Use offline augmentations to generate data using detuning, gaussian noise and time stretching from original audio files. | `0` or `1` | `1` |
 | `--use_original`       | Use original data as training data.                             | `0` or `1`               | `1`        |
@@ -82,7 +80,6 @@ python preprocess.py --name your_project_name
 
 
 Notes:
-- If `--val_dir` is not specified, the validation set will be generated from the folder specified with `--val_split`
 - Downsampling audio files is recommended, use `--sampling_rate` argument for that purpose
 - Preprocessed audio files will be saved to `/data/preprocessed` folder
 - A CSV file will be saved in the `/data/dataset/` folder with the following syntax: `your_project_name_dataset_split.csv`
@@ -142,12 +139,8 @@ After training, the following files will be created:
 In `/runs/your_project_name_date_time/`:
 - Model checkpoints (`.pth`)
 - Torchscript model (`.ts`)
-- ONNX model (`.onnx`) — only if `--onnx 1` was passed
+- ONNX model (`.onnx`), only if `--onnx 1` was passed
 - Configuration (`.yaml`)
-
-In `/logs/your_project_name_date_time/`:
-- Confusion matrix (`.csv`)
-- Results (`.csv`)
 
 ## 🎯 Finetuning
 
@@ -168,7 +161,7 @@ By default, the script uses `flute_pretained.pth` model from folder `pretrained`
 ## 💻 Running the model in real-time using Max/MSP
 
 We developed a dedicated Max/MSP object to run the exported `.ts` model in real-time.
-Follow the instructions of the [ipt_tilde](https://github.com/nbrochec/ipt_tilde) repository.
+Follow the instructions of the [ipt_tilde](https://github.com/DYCI2/ipt_tilde) repository.
 
 ## 🧠 About
 This project is part of an ongoing research effort into the real-time recognition of instrumental playing techniques for interactive music systems.

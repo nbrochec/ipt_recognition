@@ -6,8 +6,7 @@ def parse_args():
     parser.add_argument('-n', '--name', type=str, help='Name of the project.', required=True)
     parser.add_argument('-sr', '--sampling_rate', type=int, help='Sampling rate for downsampling the audio files.', default=44100)
     parser.add_argument('--train_dir', type=str, help='Directory of training samples to preprocess.', default='train')
-    parser.add_argument('--test_ratio', type=float, help='Fraction of data to use for test set.', default=0.1)
-    parser.add_argument('--val_ratio', type=float, help='Fraction of data to use for validation set.', default=0.1)
+    parser.add_argument('--val_ratio', type=float, help='Fraction of data to use for validation set.', default=0.2)
     parser.add_argument('--segment_overlap', type=str, help='Overlap between audio segments. Increase the data samples by a factor 2.')
     parser.add_argument('--padding', type=str, help='Pad the arrays with zeros.', default='minimal')
     parser.add_argument('--use_original', type=int, help='Use original data for training.', default=1)
@@ -28,7 +27,7 @@ if __name__ == '__main__':
 
     args.segment_length = SegLenConverter.parse_and_convert(args.segment_length, args.sampling_rate)
 
-    for split in [args.train_dir, args.test_dir, args.val_dir]:
+    for split in [args.train_dir, args.val_dir]:
         dir_path = os.path.join(raw_dir, split)
         is_train = (split == args.train_dir)
         preprocessor = AudioPreprocessor(args, dir_path, preprocessed_dir, is_train=is_train)
