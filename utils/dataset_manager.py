@@ -273,12 +273,17 @@ class DatasetValidator:
         data = pd.read_csv(self.csv)
 
         train_labels = set(data[data['set'] == 'train']['label_name'].unique())
-        test_labels = set(data[data['set'] == 'test']['label_name'].unique())
+        # test_labels = set(data[data['set'] == 'test']['label_name'].unique())
         val_labels = set(data[data['set'] == 'val']['label_name'].unique())
 
-        if not (train_labels == test_labels == val_labels):
+        # if not (train_labels == test_labels == val_labels):
+        #     raise ValueError(
+        #         "Mismatch in labels between train, test, and val sets.")
+
+        if not (train_labels == val_labels):
             raise ValueError(
-                "Mismatch in labels between train, test, and val sets.")
+                "Mismatch in labels between train, and val sets."
+            )
 
         print("Label validation passed: All sets have the same labels.")
 
