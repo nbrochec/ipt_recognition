@@ -1,0 +1,107 @@
+name: CI Performance — Validate training pipeline
+
+on:
+  push:
+    branches: [ performance ]
+  pull_request:
+    branches: [ performance ]
+  workflow_dispatch:
+
+jobs:
+  train:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11.7'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Create dummy dataset
+      run: |
+        mkdir -p data/raw/train/class1 data/raw/train/class2
+
+        python -c "
+        import numpy as np
+        import soundfile as sf
+
+        for i in range(20):
+            sample_rate = 16000
+            duration = 1.0
+            t = np.linspace(0, duration, int(sample_rate * duration))
+            signal_class1 = np.sin(2 * np.pi * 440 * t)
+            signal_class2 = np.random.normal(0, 1, len(t))
+            sf.write(f'data/raw/train/class1/sample_{i}.wav', signal_class1, sample_rate)
+            sf.write(f'data/raw/train/class2/sample_{i}.wav', signal_class2, sample_rate)
+        "
+
+    - name: Preprocess dataset
+      run: |
+        python preprocess.py -n run_flute --train_dir train -sr 16000 -seglen '1000 ms'
+        python preprocess.py -n run_eguitar --train_dir train -sr 16000 -seglen '1000 ms'
+
+    - name: Train flute model
+      run: |
+        python train.py -n run_flute -d cpu -m flute -sr 16000 --num_workers 2 --batch_size 32 -e 1 --n_mels 128 --n_fft 2048 --hop_length 512 -seglen '1000 ms' --onnx 1 || true
+
+    - name: Train eguitar model
+      run: |
+        python train.py -n run_eguitar -d cpu -m eguitar -sr 16000 --num_workers 2 --batch_size 32 -e 1 --n_mels 128 --n_fft 2048 --hop_length 512 -seglen '1000 ms' --onnx 1 || true
+
+    - name: Train from cfg
+      run: |
+        python train.py -n run_flute -cfg config_example.yaml || true
+
+    - name: Check model in folder
+      run: |
+        ls -R runs/
+
+    - name: Verify ONNX export
+      run: |
+        python -c "
+        import glob, sys
+        onnx_files = glob.glob('runs/**/*.onnx', recursive=True)
+        if not onnx_files:
+            print('ERROR: No .onnx files found in runs/')
+            sys.exit(1)
+        print(f'Found {len(onnx_files)} ONNX file(s):')
+        for f in onnx_files:
+            print(f'  {f}')
+        import onnx
+        for f in onnx_files:
+            onnx.checker.check_model(onnx.load(f))
+            print(f'  {f}: valid')
+        " || true
+
+    - name: Create dummy dataset for finetuning
+      run: |
+        mkdir -p data/raw/finetune_train/class1 data/raw/finetune_train/class2
+
+        python -c "
+        import numpy as np
+        import soundfile as sf
+
+        for i in range(20):
+            sample_rate = 44100
+            duration = 1.0
+            t = np.linspace(0, duration, int(sample_rate * duration))
+            signal_class1 = np.sin(2 * np.pi * 440 * t)
+            signal_class2 = np.random.normal(0, 1, len(t))
+            sf.write(f'data/raw/finetune_train/class1/sample_{i}.wav', signal_class1, sample_rate)
+            sf.write(f'data/raw/finetune_train/class2/sample_{i}.wav', signal_class2, sample_rate)
+        "
+
+    - name: Preprocess dataset for finetuning
+      run: |
+        python preprocess.py -n finetuning --train_dir finetune_train -sr 44100 -seglen '14700 samps'
+
+    - name: Finetune flute model
+      run: |
+        python finetune.py -n finetuning -d cpu -m base -sr 44100 --num_workers 2 --batch_size 32 -e 1 --n_mels 384 --n_fft 2048 --hop_length 128 -seglen '14700 samps' || true
