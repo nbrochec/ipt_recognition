@@ -227,7 +227,7 @@ if __name__ == '__main__':
 
     # Prepare data
     dataPreparator = PrepareData(args, csv_file_path)
-    train_loader, test_loader, val_loader = dataPreparator.prepare()
+    train_loader, val_loader = dataPreparator.prepare()
 
     # Create run directory
     date = datetime.datetime.now().strftime('%Y%m%d')
@@ -329,13 +329,13 @@ if __name__ == '__main__':
     print(f"TESTING BEST MODEL (from epoch {num_epoch+1})")
     print(f"{'='*60}\n")
 
-    stkd_mtrs, cm = trainer.test_model(test_loader)
+    # stkd_mtrs, cm = trainer.test_model(test_loader)
 
-    ToTensorboard.upload(stkd_mtrs, cm, csv_file_path, log_queue)
-    print(f'Results and Confusion Matrix have been uploaded to tensorboard.')
+    # ToTensorboard.upload(stkd_mtrs, cm, csv_file_path, log_queue)
+    # print(f'Results and Confusion Matrix have been uploaded to tensorboard.')
 
-    ToDisk.save(args, stkd_mtrs, cm, csv_file_path, current_run)
-    print(f'Results and Confusion Matrix have been saved in the logs/{os.path.basename(current_run)} directory.')
+    # ToDisk.save(args, stkd_mtrs, cm, csv_file_path, current_run)
+    # print(f'Results and Confusion Matrix have been saved in the logs/{os.path.basename(current_run)} directory.')
 
     # Save final model
     torch.save(model.state_dict(), f'{current_run}/{args.name}_finetune_{date}_{time}.pth')
