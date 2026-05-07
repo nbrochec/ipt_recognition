@@ -140,6 +140,7 @@ if __name__ == '__main__':
         else:
             if args.early_stopping:
                 counter += 1
+                print(f"  Early stopping counter: {counter}/{early_stopping_threshold}")
                 if counter >= early_stopping_threshold:
                     print('Early stopping triggered.')
                     break
