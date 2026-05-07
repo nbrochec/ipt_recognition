@@ -300,7 +300,7 @@ if __name__ == '__main__':
         log_queue.put(('Accuracy/val', val_acc, epoch))
         log_queue.put(('F1/val', val_f1, epoch))
 
-        print(f"Epoch {epoch+1}/{args.epochs} - Train Loss: {train_loss:.4f} - Val Loss: {val_loss:.4f} - Val Acc: {val_acc:.4f} - Val F1: {val_f1:.4f}")
+        # print(f"Epoch {epoch+1}/{args.epochs} - Train Loss: {train_loss:.4f} - Val Loss: {val_loss:.4f} - Val Acc: {val_acc:.4f} - Val F1: {val_f1:.4f}")
 
         if args.reduce_lr:
             scheduler.step(val_loss)
@@ -313,14 +313,14 @@ if __name__ == '__main__':
             num_epoch = epoch
             best_state = model.state_dict()
             torch.save(model.state_dict(), f'{current_run}/{args.name}_finetune_{date}_{time}.pth')
-            print(f"  ✓ New best model saved (val_loss: {val_loss:.4f})")
+            # print(f"  New best model saved (val_loss: {val_loss:.4f})")
             empty_cache()
         else:
             if args.early_stopping:
                 counter += 1
                 print(f"  Early stopping counter: {counter}/{early_stopping_threshold}")
                 if counter >= early_stopping_threshold:
-                    print('\n🛑 Early stopping triggered.')
+                    print('Early stopping triggered.')
                     break
     
     # Load best model and test
