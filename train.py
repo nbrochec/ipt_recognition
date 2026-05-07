@@ -31,7 +31,7 @@ def parse_arguments():
     parser.add_argument('--online_augment', type=int, help='Use online augmentations based on polarity inversion, lpf and hpf.')
     parser.add_argument('-lr','--learning_rate', type=float, help='Learning rate.', default=0.001)
     parser.add_argument('-e', '--epochs', type=int, help='Number of training epochs.', default=100)
-    parser.add_argument('--early_stopping', type=int, help='Number of epochs without improvement before early stopping.', default=None)
+    parser.add_argument('--early_stopping', type=int, help='Number of epochs without improvement before early stopping.', default=5)
     parser.add_argument('--reduce_lr', type=int, help='Reduce learning rate if validation plateaus.', default=None)
     parser.add_argument('--batch_size', type=int, default=128, help='Specify batch size.')
     parser.add_argument('--n_mels', type=int, help='Number of Mel bands.', default=128)

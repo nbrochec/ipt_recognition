@@ -47,7 +47,7 @@ def parse_arguments():
     # Training hyperparameters
     parser.add_argument('-lr','--learning_rate', type=float, help='Learning rate (use lower for fine-tuning).', default=0.0003)
     parser.add_argument('-e', '--epochs', type=int, help='Number of training epochs.', default=50)
-    parser.add_argument('--early_stopping', type=int, help='Number of epochs without improvement before early stopping.', default=10)
+    parser.add_argument('--early_stopping', type=int, help='Number of epochs without improvement before early stopping.', default=5)
     parser.add_argument('--reduce_lr', type=int, help='Reduce learning rate if validation plateaus.', default=1)
     parser.add_argument('--batch_size', type=int, default=128, help='Specify batch size.')
     parser.add_argument('--num_workers', type=int, help='Number of workers for data loading.', default=4)

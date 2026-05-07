@@ -109,7 +109,7 @@ You can use the following arguments if you want to test different configurations
 | `--epochs`          | Number of training epochs.                                         | Integer value > `0`            | `100`           |
 | `--online_augment`  | Use online augmentations based on polarity inversion, lpf and hpf. | `0` or `1` |      `0`     |
 | `--num_workers`     | Number of workers for data loading.                                | Integer value > `0`            | `4`            |
-| `--early_stopping`  | Number of epochs without improvement before early stopping.         | Integer value > `0`   |        |
+| `--early_stopping`  | Number of epochs without improvement before early stopping.         | Integer value > `0`   |   `5`     | 
 | `--reduce_lr`        | Reduce learning rate if validation plateaus.                       | `0` or `1`             |     `0`    |
 | `--onnx`             | Export model to ONNX format after training.                        | `0` or `1`             |     `0`    |
 
