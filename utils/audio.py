@@ -22,6 +22,7 @@ class AudioPreprocessor:
         self.padding = args.padding
         self.augmenter = AudioOfflineTransforms(args.sampling_rate)
         self.is_train = is_train
+        self.offline_augment = args.offline_augment
         
     def ensure_dir_exists(self, directory):
         """Ensure the folder exists"""
@@ -51,7 +52,7 @@ class AudioPreprocessor:
             segments = self.process_segments(waveform)
 
             for idx, segment in enumerate(segments):
-                if self.is_train:
+                if self.is_train and self.offline_augment:
                     aug1, aug2, aug3 = self.augmenter(segment)
                     self.save_segment(aug1, output_dir, idx, "detuned", file_path)
                     self.save_segment(aug2, output_dir, idx, "noise", file_path)

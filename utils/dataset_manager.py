@@ -262,7 +262,7 @@ class DatasetSplitter:
         for src_dir, filename, class_name in files:
             dst_class_dir = os.path.join(self.base_dir, dest_dir_name, class_name)
             DirectoryManager.ensure_dir_exists(dst_class_dir)
-            shutil.move(os.path.join(src_dir, filename), os.path.join(dst_class_dir, filename))
+            shutil.copy2(os.path.join(src_dir, filename), os.path.join(dst_class_dir, filename))
 
 class DatasetValidator:
     def __init__(self, csv_file):
