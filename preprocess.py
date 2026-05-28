@@ -12,6 +12,7 @@ def parse_args():
     parser.add_argument('--use_original', type=int, help='Use original data for training.', default=1)
     parser.add_argument('-seglen','--segment_length', type=str, help='Defines segment length of audio data samples.', default='14700 samps')
     parser.add_argument('-atk', '--attack', type=int, help='Use attack augmentations.', default=0)
+    parser.add_argument('--offline_augment', type=int, help='Use offline augmentations.', default=1)
 
     return parser.parse_args()
 
