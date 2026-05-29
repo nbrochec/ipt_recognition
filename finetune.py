@@ -78,12 +78,12 @@ def freeze_conv_layers(model, model_type):
             param.requires_grad = True
             trainable_params += param.numel()
     
-    print(f"\n{'='*60}")
-    print(f"FINE-TUNING CONFIGURATION:")
-    print(f"{'='*60}")
-    print(f"Frozen parameters:     {frozen_params:,} (conv layers + logmel)")
-    print(f"Trainable parameters:  {trainable_params:,} (fc layers only)")
-    print(f"{'='*60}\n")
+    # print(f"\n{'='*60}")
+    # print(f"FINE-TUNING CONFIGURATION:")
+    # print(f"{'='*60}")
+    # print(f"Frozen parameters:     {frozen_params:,} (conv layers + logmel)")
+    # print(f"Trainable parameters:  {trainable_params:,} (fc layers only)")
+    # print(f"{'='*60}\n")
     
     return model
 
@@ -92,9 +92,9 @@ def verify_audio_parameters(model, args):
     Verify that audio parameters match between pretrained model and current args.
     Raises an error if critical parameters don't match.
     """
-    print(f"\n{'='*60}")
-    print("VERIFYING AUDIO PARAMETERS")
-    print(f"{'='*60}")
+    # print(f"\n{'='*60}")
+    # print("VERIFYING AUDIO PARAMETERS")
+    # print(f"{'='*60}")
     
     mismatches = []
     warnings = []
@@ -138,10 +138,10 @@ def verify_audio_parameters(model, args):
         print("\nThese differences may affect model performance.")
         print("Consider using the same mel parameters as the pretrained model.")
     
-    if not mismatches and not warnings:
-        print("✓ All audio parameters match!")
+    # if not mismatches and not warnings:
+    #     print("✓ All audio parameters match!")
     
-    print(f"{'='*60}\n")
+    # print(f"{'='*60}\n")
 
 def load_pretrained_model(model, pretrained_path, num_classes, args):
     """
@@ -174,18 +174,18 @@ def load_pretrained_model(model, pretrained_path, num_classes, args):
     model_dict.update(pretrained_dict)
     model.load_state_dict(model_dict)
     
-    loaded_encoder = len([k for k in pretrained_dict.keys() if 'fc' not in k])
-    loaded_fc = len([k for k in pretrained_dict.keys() if 'fc' in k])
+    # loaded_encoder = len([k for k in pretrained_dict.keys() if 'fc' not in k])
+    # loaded_fc = len([k for k in pretrained_dict.keys() if 'fc' in k])
     
-    print(f"✓ Loaded {loaded_encoder} encoder layers")
-    print(f"✓ Loaded {loaded_fc} FC layers")
+    # print(f"✓ Loaded {loaded_encoder} encoder layers")
+    # print(f"✓ Loaded {loaded_fc} FC layers")
     
-    if skipped_layers:
-        print(f"\n⚠ Skipped {len(skipped_layers)} layer(s) (will use random init):")
-        for layer in skipped_layers[:5]:
-            print(f"  • {layer}")
-        if len(skipped_layers) > 5:
-            print(f"  ... and {len(skipped_layers) - 5} more")
+    # if skipped_layers:
+    #     print(f"\n⚠ Skipped {len(skipped_layers)} layer(s) (will use random init):")
+    #     for layer in skipped_layers[:5]:
+    #         print(f"  • {layer}")
+    #     if len(skipped_layers) > 5:
+    #         print(f"  ... and {len(skipped_layers) - 5} more")
     
     print(f"\n✓ Ready to fine-tune on {num_classes} classes\n")
     
@@ -262,8 +262,8 @@ if __name__ == '__main__':
     trainable_params = [p for p in model.parameters() if p.requires_grad]
     optimizer = Adam(trainable_params, lr=args.learning_rate, weight_decay=1e-5)
 
-    print(f"\nOptimizing {len(trainable_params)} parameter groups")
-    print(f"Learning rate: {args.learning_rate}\n")
+    # print(f"\nOptimizing {len(trainable_params)} parameter groups")
+    # print(f"Learning rate: {args.learning_rate}\n")
 
     loss_fn = nn.CrossEntropyLoss()
 
@@ -287,9 +287,10 @@ if __name__ == '__main__':
     counter = 0
     num_epoch = 0
 
-    print(f"{'='*60}")
-    print(f"STARTING FINE-TUNING")
-    print(f"{'='*60}\n")
+    # print(f"{'='*60}")
+    # print(f"STARTING FINE-TUNING")
+    # print(f"{'='*60}\n")
+    print(f"Starting fine-tuning...\n")
 
     for epoch in range(args.epochs):
         train_loss = trainer.train_epoch(train_loader, optimizer)
