@@ -122,17 +122,17 @@ def verify_audio_parameters(model, args):
     
     # Print results
     if mismatches:
-        print("\n❌ CRITICAL MISMATCHES FOUND:")
+        print("\n CRITICAL MISMATCHES FOUND:")
         for mismatch in mismatches:
             print(f"  • {mismatch}")
-        print("\n⚠️  Fine-tuning will likely fail. Please ensure:")
+        print("\n  Fine-tuning will likely fail. Please ensure:")
         print("   1. Preprocess your new data with the SAME parameters as the pretrained model")
         print("   2. Use the same -sr and -seglen arguments")
         print(f"\n{'='*60}\n")
         raise ValueError("Audio parameter mismatch detected. Cannot proceed with fine-tuning.")
     
     if warnings:
-        print("\n⚠️  WARNINGS (non-critical):")
+        print("\n  WARNINGS (non-critical):")
         for warning in warnings:
             print(f"  • {warning}")
         print("\nThese differences may affect model performance.")
@@ -240,7 +240,7 @@ if __name__ == '__main__':
 
     current_run_name = f'{args.name}_finetune_{date}_{time}'
     setattr(args, "current_run_name", current_run_name)
-    print(f'\n🔥 Fine-tuning Run: {current_run_name}\n')
+    print(f'Fine-tuning Run: {current_run_name}\n')
 
     # Initialize model
     modelPreparator = PrepareModel(args)
@@ -271,7 +271,7 @@ if __name__ == '__main__':
         scheduler = ReduceLROnPlateau(optimizer, 'min', patience=5, factor=0.5)
 
     transform = AudioOnlineTransforms(args)
-    trainer = ModelTrainer(model, loss_fn, args.device, transform)
+    trainer = ModelTrainer(model, loss_fn, args.device, transform, args.num_classes)
 
     # Setup logging
     log_queue = Queue()
