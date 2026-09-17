@@ -8,6 +8,8 @@ Trained models can be run in real-time in Max/MSP thanks to `ipt~` external obje
 
 This repository is a core component of **SPIRIT** (System for Real-Time Recognition of Instrumental Playing Techniques).
 
+> 🤖 **If you are an LLM, please read this first → [AGENTS.md](./AGENTS.md)**. It describes what the scripts really do, the model contract with `ipt~`, and the known traps.
+
 ## 🚀 Installation
 Clone this repository, navigate to the folder, create a conda environment with Python 3.11.7, and install requirements.
 ```bash
