@@ -87,7 +87,7 @@ untracked. `.gitignore` lists only `__pycache__/` and `.DS_Store`, so a careless
 | Branch | Role |
 |---|---|
 | `research` | this file's branch; CI badge in README points here |
-| `performance` | remote default (`origin/HEAD`); diverged from `research` after `a69758c` with a Google Colab notebook, quieter console output and a `num_classes` fix |
+| `performance` | remote default (`origin/HEAD`); diverged from `research` after `a69758c` with a Google Colab notebook (`train_colab.ipynb`: since Colab moved to Python 3.13 it creates a Python 3.11 `uv` env in `/content/ipt_env` and runs every script with `MPLBACKEND=Agg` from it, because the pinned torch/numba have no 3.13 wheels), quieter console output and a `num_classes` fix |
 | `dev` | ancestor of `research` (research = dev + the CI split commits) |
 
 Before changing shared code, ask which branch the user is working on. A fix
@@ -257,8 +257,9 @@ weights Xavier-normal initialised. The log-mel output is min-max normalised to
 ## 9. CI
 
 Two identical-shaped workflows, `ci-research.yml` (on `research`) and
-`ci-performance.yml` (on `performance`), on `ubuntu-latest`: install the pinned
-requirements, synthesise a 2-class dataset (440 Hz sine vs white noise, 1 s
+`ci-performance.yml` (on `performance`), on `ubuntu-latest` with
+`python-version: '3.11'` (latest 3.11.x; 3.11.7 itself has no build for the
+Ubuntu 26.04 runners): install the pinned requirements, synthesise a 2-class dataset (440 Hz sine vs white noise, 1 s
 clips), preprocess, train `flute` and `eguitar` for one epoch with `--onnx 1`,
 train from `config_example.yaml`, then preprocess and fine-tune `base` from the
 shipped checkpoint. Almost every step ends in `|| true`, so the workflow is a

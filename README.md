@@ -1,6 +1,6 @@
 # 🎵 Real-Time Instrumental Playing Techniques Recognition
 
-[![CI Research](https://github.com/nbrochec/ipt_recognition/actions/workflows/ci-research.yml/badge.svg?branch=research)](https://github.com/nbrochec/ipt_recognition/actions/workflows/ci-research.yml)
+[![CI Research](https://github.com/DYCI2/ipt_recognition/actions/workflows/ci-research.yml/badge.svg?branch=research)](https://github.com/DYCI2/ipt_recognition/actions/workflows/ci-research.yml)
 
 This repository provides a toolkit for the real-time recognition of instrumental playing techniques using deep learning CNN models. It allows the user to train his own classification model using his personal data. The toolkit also provide pre-trained models for flute and eguitar IPT recognition.
 
@@ -13,7 +13,7 @@ This repository is a core component of **SPIRIT** (System for Real-Time Recognit
 ## 🚀 Installation
 Clone this repository, navigate to the folder, create a conda environment with Python 3.11.7, and install requirements.
 ```bash
-git clone https://github.com/nbrochec/ipt_recognition/
+git clone https://github.com/DYCI2/ipt_recognition/
 cd ipt_recognition
 conda create --name IPT python=3.11.7
 conda activate IPT
