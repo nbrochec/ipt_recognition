@@ -1,7 +1,7 @@
 # 🎵 Real-Time Instrumental Playing Techniques Recognition
 
-[![CI Performance](https://github.com/nbrochec/ipt_recognition/actions/workflows/ci-performance.yml/badge.svg?branch=performance)](https://github.com/nbrochec/ipt_recognition/actions/workflows/ci-performance.yml)
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/nbrochec/ipt_recognition/blob/performance/train_colab.ipynb)
+[![CI Performance](https://github.com/DYCI2/ipt_recognition/actions/workflows/ci-performance.yml/badge.svg?branch=performance)](https://github.com/DYCI2/ipt_recognition/actions/workflows/ci-performance.yml)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/DYCI2/ipt_recognition/blob/performance/train_colab.ipynb)
 
 This repository provides a toolkit for the real-time recognition of instrumental playing techniques using deep learning CNN models. It allows the user to train their own classification model using their personal data. The toolkit also provides pre-trained models for flute and eguitar IPT recognition.
 
@@ -18,14 +18,14 @@ This repository is a core component of **SPIRIT** (System for Real-Time Recognit
 ## 🚀 Installation
 Clone this repository, navigate to the folder, create a conda environment with Python 3.11.7, and install requirements.
 ```bash
-git clone https://github.com/nbrochec/ipt_recognition/
+git clone https://github.com/DYCI2/ipt_recognition/
 cd ipt_recognition
 conda create --name IPT python=3.11.7
 conda activate IPT
 pip install -r requirements.txt
 ```
 
-Non-expert users: we recommend you to use our Jupyter Notebook `train.ipynb`, or run everything in the browser with no installation using our [Google Colab notebook](https://colab.research.google.com/github/nbrochec/ipt_recognition/blob/performance/train_colab.ipynb).
+Non-expert users: we recommend you to use our Jupyter Notebook `train.ipynb`, or run everything in the browser with no installation using our [Google Colab notebook](https://colab.research.google.com/github/DYCI2/ipt_recognition/blob/performance/train_colab.ipynb).
 
 ## 📁 Main Folders
 ```
