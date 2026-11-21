@@ -1,13 +1,11 @@
 # 🎵 Real-Time Instrumental Playing Techniques Recognition
 
 [![CI Performance](https://github.com/DYCI2/ipt_recognition/actions/workflows/ci-performance.yml/badge.svg?branch=performance)](https://github.com/DYCI2/ipt_recognition/actions/workflows/ci-performance.yml)
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/DYCI2/ipt_recognition/blob/performance/train_colab.ipynb)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/DYCI2/ipt_recognition/blob/performance/train_colab_simple.ipynb)
 
 This repository provides a toolkit for the real-time recognition of instrumental playing techniques using deep learning CNN models. It allows the user to train their own classification model using their personal data. The toolkit also provides pre-trained models for flute and eguitar IPT recognition.
 
 Trained models can be run in real-time in Max/MSP thanks to `ipt~` external object from [ipt_tilde](https://github.com/nbrochec/ipt_tilde) repository.
-
-This repository is a core component of **SPIRIT** (System for Real-Time Recognition of Instrumental Playing Techniques).
 
 ## 🌿 Branches
 | Branch | Purpose |
