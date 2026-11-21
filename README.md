@@ -1,8 +1,8 @@
 # 🎵 Real-Time Instrumental Playing Techniques Recognition
 
 [![CI Performance](https://github.com/DYCI2/ipt_recognition/actions/workflows/ci-performance.yml/badge.svg?branch=performance)](https://github.com/DYCI2/ipt_recognition/actions/workflows/ci-performance.yml)
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/DYCI2/ipt_recognition/blob/performance/train_colab.ipynb)
-[![Open In Colab (simple)](https://img.shields.io/badge/Colab-simple-F9AB00?logo=googlecolab)](https://colab.research.google.com/github/DYCI2/ipt_recognition/blob/dev-performance/train_colab_simple.ipynb)
+[![Open In Colab (recommended)](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/DYCI2/ipt_recognition/blob/dev-performance/train_colab_simple.ipynb)
+[![Open In Colab (old)](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/DYCI2/ipt_recognition/blob/performance/train_colab.ipynb)
 
 This repository provides a toolkit for the real-time recognition of instrumental playing techniques using deep learning CNN models. It allows the user to train their own classification model using their personal data. The toolkit also provides pre-trained models for flute and eguitar IPT recognition.
 
