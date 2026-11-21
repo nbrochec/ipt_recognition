@@ -28,7 +28,7 @@ def parse_arguments():
     
     # Required arguments
     parser.add_argument('-n','--name', type=str, help='Name of the project.', required=True)
-    parser.add_argument('-pt', '--pretrained', type=str, help='Path to pretrained .pth model file.', default='pretrained/flute_pretrained.pth')
+    parser.add_argument('-pt', '--pretrained', type=str, help='Path to the pretrained model (.pth state_dict or exported .ts).', default='pretrained/flute_pretrained.pth')
     
     # Model configuration
     parser.add_argument('-d','--device', type=str, help='Specify the hardware on which computation should be performed.', default='cpu')
@@ -146,23 +146,41 @@ def verify_audio_parameters(model, args):
 def load_pretrained_model(model, pretrained_path, num_classes, args):
     """
     Load pretrained weights for all matching layers (encoder + FC).
+    The pretrained model can be a .pth state_dict or an exported .ts model.
+    The output layer is never loaded: it is tied to the pretrained class names,
+    so it starts from random init and learns the classes of the new dataset.
     Layers with mismatched shapes are skipped and keep their random initialization.
     Then we'll train on top of these weights.
     """
     print(f"\nLoading pretrained model from: {pretrained_path}")
-    
+
     # Load pretrained checkpoint
-    checkpoint = torch.load(pretrained_path, map_location='cpu')
-    
+    if pretrained_path.endswith('.ts'):
+        checkpoint = torch.jit.load(pretrained_path, map_location='cpu').state_dict()
+    else:
+        checkpoint = torch.load(pretrained_path, map_location='cpu')
+
     # Get model's current state dict
     model_dict = model.state_dict()
-    
-    # Load ALL matching layers (encoder + FC if shapes match)
+
+    # pretrained/eguitar_help.ts predates the adaptive pool added at cnn.0 of eguitar:
+    # its conv layers are numbered one lower, shift them
+    if 'cnn.0.conv.weight' in checkpoint and 'cnn.0.conv.weight' not in model_dict and 'cnn.1.conv.weight' in model_dict:
+        checkpoint = {(f"cnn.{int(k.split('.')[1]) + 1}.{k.split('.', 2)[2]}" if k.startswith('cnn.') else k): v
+                      for k, v in checkpoint.items()}
+
+    # Output layer = last Linear of the pretrained fc block
+    last_fc = max(int(k.split('.')[1]) for k in checkpoint if k.startswith('fc.'))
+    output_prefix = f'fc.{last_fc}.'
+
+    # Load ALL matching layers (encoder + FC if shapes match), except the output layer
     pretrained_dict = {}
     skipped_layers = []
-    
+
     for k, v in checkpoint.items():
-        if k in model_dict:
+        if k.startswith(output_prefix):
+            skipped_layers.append(f"{k}: output layer, trained on the new classes")
+        elif k in model_dict:
             if v.shape == model_dict[k].shape:
                 pretrained_dict[k] = v
             else:
@@ -187,6 +205,7 @@ def load_pretrained_model(model, pretrained_path, num_classes, args):
     #     if len(skipped_layers) > 5:
     #         print(f"  ... and {len(skipped_layers) - 5} more")
     
+    print(f"✓ Loaded {len(pretrained_dict)}/{len(checkpoint)} pretrained tensors")
     print(f"\n✓ Ready to fine-tune on {num_classes} classes\n")
     
     return model

@@ -66,7 +66,7 @@ not find anything.
 preprocess.py        split → resample → trim → segment → augment → save .pt, write CSV/Parquet
 train.py             train from scratch, export .pth/.ts (+ .onnx)
 finetune.py          load a .pth, optionally freeze the CNN, train the head, export .pth/.ts
-train.ipynb          notebook wrapper for non-experts (same CLI calls)
+train.ipynb          notebook for non-experts: one settings cell, start_from = scratch (base) | flute | guitar
 train_colab.ipynb    Google Colab version of the notebook (see §10)
 config/              YAML configs; --config resolves names *inside this folder*
 data/raw/            your audio, one sub-folder per class
@@ -231,8 +231,14 @@ python finetune.py  --name my_ft --pretrained pretrained/flute_pretrained.pth --
   `--hop_length 128`, `--sampling_rate 44100`, `--segment_length "14700 samps"`,
   `--learning_rate 0.0003`, `--epochs 50`, `--early_stopping 5`, `--reduce_lr 1`
   (`ReduceLROnPlateau(patience=5, factor=0.5)`).
-- Weights are copied layer by layer where **names and shapes match**; the
-  final `fc` layer with a different class count keeps its random init.
+- `--pretrained` takes a `.pth` state_dict or an exported `.ts`
+  (`pretrained/eguitar_help.ts` is the guitar starting point: `--model eguitar`,
+  8000 Hz, `7168 samps`, `--n_mels 128 --hop_length 512 --f_min 150`). Its conv
+  layers are numbered one lower than the current `eguitar` (no adaptive pool at
+  `cnn.0` when it was exported); `load_pretrained_model` shifts them.
+- Weights are copied layer by layer where **names and shapes match**. The
+  pretrained **output layer is never loaded**, even with the same class count,
+  so the model learns the new dataset's class names (any number, any names).
 - `verify_audio_parameters` raises on a sample-rate or segment-length mismatch
   with the checkpoint, and only warns on mel parameter differences.
 - `--freeze_conv 1` (default) trains only parameters whose name contains `fc`
@@ -269,7 +275,7 @@ Architecture summary:
 |---|---|---|
 | `flute` | three log-mel layers, `n_fft` 512/1024/2048, stacked as 3 channels, adaptive-pooled to 384×112 | default; pooling makes it tolerant to `n_mels`/`hop_length` changes |
 | `eguitar` | one log-mel layer, `n_fft` 2048, adaptive-pooled to 128×15, deeper CNN (512 ch) | larger model |
-| `base` | three log-mel layers like `flute`, **no adaptive pool** | the arch of `pretrained/flute_pretrained.pth`; input-size sensitive, so keep `n_mels`/`hop_length`/`seglen` identical to the checkpoint |
+| `base` | three log-mel layers like `flute`, **no adaptive pool** | the arch of `pretrained/flute_pretrained.pth` (384 mels, hop 128, 14700 samps, `f_min` 120); input-size sensitive: the last `MaxPool2d((12, 14))` needs a 384 × 112–223-frame log-mel. `train.ipynb` keeps 384 mels and sets `hop_length = seglen_samples // 114` for any window |
 
 All convolutions are `customConv2d` = Conv2d + BatchNorm2d + LeakyReLU(0.01),
 weights Xavier-normal initialised. The log-mel output is min-max normalised to
