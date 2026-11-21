@@ -68,6 +68,7 @@ train.py             train from scratch, export .pth/.ts (+ .onnx)
 finetune.py          load a .pth, optionally freeze the CNN, train the head, export .pth/.ts
 train.ipynb          notebook for non-experts: one settings cell, start_from = scratch (base) | flute | guitar
 train_colab.ipynb    Google Colab version of the notebook (see §10)
+train_colab_simple.ipynb  simplified Colab: install, settings, one cell that prepares + trains + saves to Drive (same modes as train.ipynb)
 config/              YAML configs; --config resolves names *inside this folder*
 data/raw/            your audio, one sub-folder per class
 data/preprocessed/   generated .pt tensors, one per segment (and per augmentation)
